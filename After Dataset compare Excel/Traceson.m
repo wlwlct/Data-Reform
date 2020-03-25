@@ -80,20 +80,21 @@ i=1;n=1;l=1;leng=0;elimate=3;
 %Before any calculation, modify spike first. If number less than 10 points I 
 %would make them equal to the former number. because I need at least 1 second
 %to integrate, and the exp setting is always 0.1s.
- while (i)<=columns
+if length(eff_fit(:,1))>1
+ while (i)<columns
     while eff_fit(numst,i)==eff_fit(numst,i+1)
     i=i+1;
     leng=leng+1;
-    if i>=columns
-       break 
-    end
+        if i>=columns
+            break 
+        end
     end
     nleng(1,n)=eff_fit(numst,i);
     nleng(2,l)=leng+1;
     leng=0;
     i=i+1; n=n+1;l=l+1;
     end
-
+end
     %Finding the length shorter than certain range, then make the fit intensity
     %equal to the last fit intensity.
     

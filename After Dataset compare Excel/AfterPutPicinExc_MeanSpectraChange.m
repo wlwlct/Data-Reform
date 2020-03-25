@@ -59,6 +59,7 @@ for properfolder_i=1:1:properfolder_leng
         catch
             cd(codefolder)
             [~,A.eff_fit,~,A.numst,~]=Traceson(datasetfile.scatterplot.intensity(2,:),codefolder);
+            if length(A.eff_fit(:,1))==1;A.numst=1;end
             fit_state=A.eff_fit(A.numst,:);
         end
         change_place=diff(fit_state);
