@@ -57,9 +57,9 @@ for properfolder_i=1:1:properfolder_leng
         try
             fit_state=datasetfile.side.potential(2,:);
         catch
-            fit_state=transpose(datasetfile.side.eff_fit(datasetfile.side.numst,:));
-            fit_state=[floor(datasetfile.side.ABStime_x/10^9)+1 fit_state];
-            
+            cd(codefolder)
+            [~,A.eff_fit,~,A.numst,~]=Traceson(datasetfile.scatterplot.intensity(2,:),codefolder);
+            fit_state=A.eff_fit(A.numst,:);
         end
         change_place=diff(fit_state);
         loc=find(change_place~=0);loc(1,end+1)=99;
@@ -97,16 +97,16 @@ close(gcf);
         try
             figure
             yyaxis left;plot(datasetfile.scatterplot.intensity(2,:))
-            hold on;plot(datasetfile.side.potential(2,:),'LineWidth',3)
-            hold on;scatter(loc(1,:),datasetfile.side.potential(2,loc(1,:)),100,'filled')
+            hold on;plot(fit_state(1,:),'LineWidth',3)
+            hold on;scatter(loc(1,:),fit_state(1,loc(1,:)),100,'filled')
             ylabel('Intensity (Counts/ms)');
             for i=1:F_leng
-                text(loc(1,i)-1,datasetfile.side.potential(2,loc(1,i)),...
+                text(loc(1,i)-1,fit_state(1,loc(1,i)),...
                 num2str(loc(1,i)),'HorizontalAlignment','right','FontSize',16,'Color','#0072BD')
             end
             yyaxis right;plot(datasetfile.scatterplot.lifetime(:,2));
             ylim([50 2510])
-            legend('intensity','state fit','lifetime')
+            legend('intensity','state fit','change point','lifetime')
             xlabel('Exp Time (s)')
             ylabel('Lifetime (ps)');
         catch
