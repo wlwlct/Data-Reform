@@ -1,4 +1,10 @@
 Folder preparation:
+Inside the target folder, it contains:
+  1. ccdt files
+  2. apd folder with *.mat files
+  3. ccdt folder with *.asc and *.mat files.
+  
+All files need to contain the fluorescent polymer; the wight of inert matrix material; inert matrix material; data; file label.
 
 
 Code to change:
