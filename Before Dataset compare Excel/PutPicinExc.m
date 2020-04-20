@@ -28,13 +28,13 @@ Exsheets=Ex.ActiveWorkbook.Sheets;
 Firstsheet=Exsheets.get('Item',1);
 Firstsheet.Activate
 %write in folder names
-place=strfind(pathname,'\');
-foldername=pathname(place(1,end)+1:length(pathname));
+pl=strfind(pathname,'\');
+foldername=pathname(pl(1,end)+1:length(pathname));
 Folderrange=get(Ex.ActiveSheet,'Range',['A2:A' num2str(files_leng+1)]);
 Folderrange.Value=foldername;
-title=[{'Pathname'},{'Foldername'},{'Match Plot'},{'Time Trace'},{'Mesh'}, {'Scatter Plot'}, {'First 1/3'},{'Second 1/3'},{'Third 1/3'},{'ccd Add Up'},{'asc strip'}];
+T=[{'Pathname'},{'Foldername'},{'Match Plot'},{'Time Trace'},{'Mesh'}, {'Scatter Plot'}, {'First 1/3'},{'Second 1/3'},{'Third 1/3'},{'ccd Add Up'},{'asc strip'}];
 Titlerange=get(Ex.ActiveSheet,'Range','A1:K1');
-Titlerange.Value=title;
+Titlerange.Value=T;
 dpi = get(groot, 'ScreenPixelsPerInch');  % Get screen dpi
   picrange=get(Ex.ActiveSheet,'Range',['B2:K' num2str(files_leng+1)]);
     picrange.ColumnWidth=50;
@@ -128,28 +128,17 @@ for n_num=0:1:notn
         apdintensity(n_num+1,1)=sum(datfile(n_num*segbin:end,2))*1000;%counts/sec
     end
 end
-figure
-    yyaxis left
-    plot(apdintensity);
-    yyaxis right
-    plot(ccdintensity)
-    legend('apd','ccd')
+    figure
+        yyaxis left;plot(apdintensity);
+        yyaxis right;plot(ccdintensity)
+        legend('apd','ccd')
 else
     figure
-    plot(ccdintensity);
+        plot(ccdintensity);
 end
 %save the plot
 n=n+1;
-print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-% print(gcf,'-clipboard', '-dbitmap');
- pause (0.5);
- Ex.ActiveSheet.Range(['C' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['C' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['C' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
+EXprint(Ex,'C',n,files_i,dpi)
 %%
 %plot time trace,if possible
 if ~isempty(datfile)
@@ -157,135 +146,66 @@ figure
 plot(datfile(:,1),datfile(:,2));
 xlabel('Exp Time (s)')
 ylabel('Intensity (Counts/ms)');
-n=n+1;
 %save the plot
-print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-% print(gcf,'-clipboard', '-dbitmap');
- pause (0.5);
- Ex.ActiveSheet.Range(['D' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['D' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['D' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
+n=n+1;
+EXprint(Ex,'D',n,files_i,dpi)
 end
 
 %%
 %Plot proper ccd mesh file
 if ~isempty(ccdtfile)
-figure
-mesh(1:1:length(ccdtfile(1,3:end)),ccdtfile(place:end,1),ccdtfile(place:end,3:end));
-view([0 0 1]);
-colormap(jet);
-n=n+1;
-
-print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-% print(gcf,'-clipboard', '-dbitmap');
- pause (0.5);
-Ex.ActiveSheet.Range(['E' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['E' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['E' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
+    figure
+        mesh(1:1:length(ccdtfile(1,3:end)),ccdtfile(place:end,1),ccdtfile(place:end,3:end));
+        view([0 0 1]);
+        colormap(jet);
+    n=n+1;
+    EXprint(Ex,'E',n,files_i,dpi)
 end
 %%
 %Plot average intensity, experiment time with average wavelength
-
 ccdtlength=length(ccdtfile(1,3:end));
 avewl=zeros(ccdtlength,1);
 for ccdt_n=1:1:ccdtlength
-avewl(ccdt_n,1)=sum(ccdtfile(place:end,ccdt_n+2).*ccdtfile(place:end,1))/sum(ccdtfile(place:end,ccdt_n+2));
+    avewl(ccdt_n,1)=sum(ccdtfile(place:end,ccdt_n+2).*ccdtfile(place:end,1))/sum(ccdtfile(place:end,ccdt_n+2));
 end
+
         figure
-        yyaxis left
-        plot(avewl,ccdintensity,'o');
+        yyaxis left;plot(avewl,ccdintensity,'o');
         ylabel('Intensity');
-        yyaxis right
-        plot(avewl,1:1:length(avewl),'o');
+        yyaxis right;plot(avewl,1:1:length(avewl),'o');
         ylabel('exp time (s)');
         xlabel('average wavelength after 496 nm (nm)');
         xlim([540 620])
         n=n+1;
-        print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-   pause (0.5);
-% print(gcf,'-clipboard', '-dbitmap');
-Ex.ActiveSheet.Range(['F' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['F' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['F' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
-
+        EXprint(Ex,'F',n,files_i,dpi)
 %%
 thirdccdtlength=floor(ccdtlength/3);
 %plot 1/3 of the data 1, comapare;
 figure
 plot(ccdtfile(place:end,1),sum(ccdtfile(place:end,3:thirdccdtlength+2),2));
         n=n+1;
-        print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-   pause (0.5);
-% print(gcf,'-clipboard', '-dbitmap');
-Ex.ActiveSheet.Range(['G' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['G' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['G' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
+   EXprint(Ex,'G',n,files_i,dpi)
 
 %%
 %plot 1/3 of the data 2
 figure
 plot(ccdtfile(place:end,1),sum(ccdtfile(place:end,thirdccdtlength+3:thirdccdtlength*2+2),2));
         n=n+1;
-        print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-   pause (0.5);
-% print(gcf,'-clipboard', '-dbitmap');
-Ex.ActiveSheet.Range(['H' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['H' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['H' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
+   EXprint(Ex,'H',n,files_i,dpi)
 
 %%
 %plo 1/3 of the data 3
 figure
 plot(ccdtfile(place:end,1),sum(ccdtfile(place:end,thirdccdtlength*2+3:end),2));
-        n=n+1;
-        print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-   pause (0.5);
-% print(gcf,'-clipboard', '-dbitmap');
-Ex.ActiveSheet.Range(['I' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['I' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['I' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
-
+   n=n+1;
+   EXprint(Ex,'I',n,files_i,dpi)
 %%
 %plot ccd add up
 if ~isempty(ccdtfile)
 figure
 plot(ccdtfile(place:end,1),sum(ccdtfile(place:end,3:end),2));
 n=n+1;
-
-print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-% print(gcf,'-clipboard', '-dbitmap');
- pause (0.5);
-Ex.ActiveSheet.Range(['J' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['J' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['J' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
+EXprint(Ex,'J',n,files_i,dpi)
 end
 
 %%
@@ -294,21 +214,10 @@ if ~isempty(ascfile_add_up)
         rowddup=sum(ascfile_add_up(2:end,:),2);
     [~,maxplace]=max(rowddup);
     figure
-    plot(ascfile_add_up(1,:),ascfile_add_up(maxplace+1,:));
+    plot(ascfile_add_up(1,place:end),ascfile_add_up(maxplace+1,place:end));
     n=n+1;
-
-print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-% print(gcf,'-clipboard', '-dbitmap');
- pause (0.5);
-Ex.ActiveSheet.Range(['K' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['K' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['K' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
+   EXprint(Ex,'K',n,files_i,dpi)
 end
-
 end
 
 %%
@@ -317,6 +226,14 @@ Close(Exwokbook)
 Quit(Ex)
 end
 
-function EXprint(Ex,letter)
-
+function EXprint(Ex,letter,n,files_i,dpi)
+print(gcf, sprintf('-r%d', dpi),'-clipboard', '-dbitmap');% Print the figure at the screen resolution
+% print(gcf,'-clipboard', '-dbitmap');
+pause (0.5);
+Ex.ActiveSheet.Range([letter num2str(files_i)]).PasteSpecial();
+Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
+Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range([letter num2str(files_i)]).Width;    %Adjusting width
+Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range([letter num2str(files_i)]).Height;  %Adjusting height
+Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
+close(gcf);
 end
