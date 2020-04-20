@@ -7,13 +7,13 @@
 clear all
 codefolder=pwd;
 %For my file need to change Generalname etc.;
-folderlocation='E:\';
+folderlocation='E:\MEH substrate clean mat data';
 cd(folderlocation);
-properfolder=dir('02202020 Rerun');
+properfolder=dir('062220*');
+place=22;
 properfolder_leng=length(properfolder);
 for properfolder_i=1:1:properfolder_leng
 pathname=[properfolder(properfolder_i).folder '\' properfolder(properfolder_i).name];
-
 %Open excel and try to put into proper place
 % names=extractfield(files,'name');
 % names=reshape(names,[files_leng,1]);
@@ -36,6 +36,9 @@ title=[{'Pathname'},{'Foldername'},{'Match Plot'},{'Time Trace'},{'Mesh'}, {'Sca
 Titlerange=get(Ex.ActiveSheet,'Range','A1:K1');
 Titlerange.Value=title;
 dpi = get(groot, 'ScreenPixelsPerInch');  % Get screen dpi
+  picrange=get(Ex.ActiveSheet,'Range',['B2:K' num2str(files_leng+1)]);
+    picrange.ColumnWidth=50;
+    picrange.RowHeight=100;
 n=0;
 for files_i=2:1:files_leng+1
 filename=files(files_i-1).name;
@@ -44,7 +47,6 @@ pathname=files(files_i-1).folder;
 regularexp='\d*d\d*d\d*.mat';
 T=regexp(filename,regularexp);
 Generalname=filename(T:end-4);
-
 
 %try and catch to load eberything that is possible
 ccdtfile=[];
@@ -173,7 +175,7 @@ end
 %Plot proper ccd mesh file
 if ~isempty(ccdtfile)
 figure
-mesh(1:1:length(ccdtfile(1,3:end)),ccdtfile(:,1),ccdtfile(:,3:end));
+mesh(1:1:length(ccdtfile(1,3:end)),ccdtfile(place:end,1),ccdtfile(place:end,3:end));
 view([0 0 1]);
 colormap(jet);
 n=n+1;
@@ -195,8 +197,7 @@ end
 ccdtlength=length(ccdtfile(1,3:end));
 avewl=zeros(ccdtlength,1);
 for ccdt_n=1:1:ccdtlength
-    [~,position496]=min(abs(ccdtfile(:,1)-496));
-avewl(ccdt_n,1)=sum(ccdtfile(position496:end,ccdt_n+2).*ccdtfile(position496:end,1))/sum(ccdtfile(position496:end,ccdt_n+2));
+avewl(ccdt_n,1)=sum(ccdtfile(place:end,ccdt_n+2).*ccdtfile(place:end,1))/sum(ccdtfile(place:end,ccdt_n+2));
 end
         figure
         yyaxis left
@@ -223,7 +224,7 @@ close(gcf);
 thirdccdtlength=floor(ccdtlength/3);
 %plot 1/3 of the data 1, comapare;
 figure
-plot(ccdtfile(:,1),sum(ccdtfile(:,3:thirdccdtlength+2),2));
+plot(ccdtfile(place:end,1),sum(ccdtfile(place:end,3:thirdccdtlength+2),2));
         n=n+1;
         print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
       '-clipboard', '-dbitmap');
@@ -239,7 +240,7 @@ close(gcf);
 %%
 %plot 1/3 of the data 2
 figure
-plot(ccdtfile(:,1),sum(ccdtfile(:,thirdccdtlength+3:thirdccdtlength*2+2),2));
+plot(ccdtfile(place:end,1),sum(ccdtfile(place:end,thirdccdtlength+3:thirdccdtlength*2+2),2));
         n=n+1;
         print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
       '-clipboard', '-dbitmap');
@@ -255,7 +256,7 @@ close(gcf);
 %%
 %plo 1/3 of the data 3
 figure
-plot(ccdtfile(:,1),sum(ccdtfile(:,thirdccdtlength*2+3:end),2));
+plot(ccdtfile(place:end,1),sum(ccdtfile(place:end,thirdccdtlength*2+3:end),2));
         n=n+1;
         print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
       '-clipboard', '-dbitmap');
@@ -272,7 +273,7 @@ close(gcf);
 %plot ccd add up
 if ~isempty(ccdtfile)
 figure
-plot(ccdtfile(:,1),sum(ccdtfile(:,3:end),2));
+plot(ccdtfile(place:end,1),sum(ccdtfile(place:end,3:end),2));
 n=n+1;
 
 print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
@@ -314,4 +315,8 @@ end
 SaveAs(Exwokbook,[pathname '\' foldername '.xlsx']);
 Close(Exwokbook)
 Quit(Ex)
+end
+
+function EXprint(Ex,letter)
+
 end
