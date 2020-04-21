@@ -1,30 +1,32 @@
 %filename=[];
 clear all;
 clc;
-pathname=['C:\Users\Livi\Documents\Results\0505convolution\'];
+%pathname=['/scratch/lwang74/PTU_spectrum_lifetime_bluhive/PTUdata/01222019/apd/'];
+pathname=['/scratch/lwang74/PTU_spectrum_lifetime_bluehive/PTUdata/06252019/apd/'];
 current_folder=pwd;
 cd(pathname);
 allnames=struct2cell(dir('*.ptu')); 
 [~,len]=size(allnames); 
 for ii=1:len
-    cd(current_folder)
+    cd(current_folder);
+disp('Move to program folder')
     filename=allnames{1,ii};
 %[filename,pathname]=uigetfile('*.ptu', 'T-Mode data:');
-try
+%try
 Resolution=Read_PTU_Mod(filename, pathname);
-disp('Finish PTU demo convert')
+disp('Finish using demo code to convert data to *.out file');
 PTU3file=importdata(strcat(pathname,filename(1:length(filename)-4), '.out'));
-disp('Finish load *.out file')
 PTU3file=rmfield(PTU3file,'textdata');
+disp('Finish loading *.out file, prepare to transfer to *.mat file');
 %cd(pathname)
 %PTU3file=importdata(strcat(pathname,filename(1:length(filename)-4), '.out'),',',1);
 %[A,B,C]=importdata(strcat(pathname,filename(1:length(filename)-4), '.out'));
-cd(pathname)
-save(strcat(filename(1:length(filename)-4),'.mat'),'PTU3file','Resolution')
-disp('Finish generate *.mat, it suppose to move to next file...')
-clearvars Resolution PTU3file
-catch me
-    disp(strcat('Something wrong with file',filename));
-end
-cd(pathname)
+cd(pathname);
+save(strcat(filename(1:length(filename)-4),'.mat'),'PTU3file','Resolution');
+disp('It suppose to finish saving as *.mat file and move to the next!');
+clearvars Resolution PTU3file;
+%catch me
+ %   disp(strcat('Somrthing wrong with file',filename));
+
+%end
 end
