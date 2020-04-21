@@ -8,8 +8,8 @@ clear all
 codefolder=pwd;
 folderlocation='E:\MEH substrate clean mat data';
 cd(folderlocation);
-properfolder=dir('062220*');
-place=22;
+properfolder=dir('062820*');
+place=21;
 properfolder_leng=length(properfolder);
 for properfolder_i=1:1:properfolder_leng
     pathname=[properfolder(properfolder_i).folder '\' properfolder(properfolder_i).name];
