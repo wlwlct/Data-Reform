@@ -7,14 +7,14 @@ clearvars
 codefolder=pwd;
 %solvent='F8T2O2';
 %srdir=['/scratch/lwang74/PTU_spectrum_lifetime_bluehive/PTUdata/' solvent];
-srdir=['E:\F8T2N2'];
+srdir=['E:\MEH substrate clean mat data\Chloroform dataset'];
 cd (srdir)
 
-
-allnames=struct2cell(dir( '*02042019*4d1d1.mat'));
+condition='MEH Chloroform'
+allnames=struct2cell(dir( '*2019*.mat'));
 [~,len]=size(allnames);
 for len_i=1:1:len
-    clearvars -except srdir codefolder solvent len_i len allnames
+    clearvars -except srdir codefolder solvent len_i len allnames condition
     datasetname=char(allnames(1,len_i));
     datasetfile=load([srdir '\' datasetname]);
     rowrange=datasetfile.dataset.rowrange;clearvars datasetfile
@@ -23,7 +23,7 @@ for len_i=1:1:len
     date=regexp(datasetname,'\d*2019','match');
     file=regexp(datasetname,'\dd\dd\d*','match');
     
-    cd([srdir '\apd full'])
+    cd([srdir '\apd full'])%apd file folder
     apdfile=dir(['*' date{1} '*' file{1} '.mat']);
     if isempty(apdfile)
         disp(['Wrong apd related to' datasetfile])
@@ -59,6 +59,6 @@ for len_i=1:1:len
     end
     
 cd([srdir '\apd full'])
-save(['F8T2 Chloroform 2kDa N2 ' date{1} ' SecDtime ' file{1} '.mat'],'SecDtime');   
+save([condition ' ' date{1} ' SecDtime ' file{1} '.mat'],'SecDtime');   
     
 end
