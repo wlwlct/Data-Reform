@@ -5,32 +5,32 @@
 %1:6252, third column is intensity.
 clearvars
 codefolder=pwd;
-%solvent='F8T2O2';
-%srdir=['/scratch/lwang74/PTU_spectrum_lifetime_bluehive/PTUdata/' solvent];
-srdir=['E:\MEH substrate clean mat data\Chloroform dataset'];
+solvent='MEH_CH';
+srdir=['/scratch/lwang74/PTU_spectrum_lifetime_bluehive/PTUdata/' solvent];
+%srdir=['E:\F8T2N2'];
 cd (srdir)
 
-condition='MEH Chloroform'
+
 allnames=struct2cell(dir( '*2019*.mat'));
 [~,len]=size(allnames);
 for len_i=1:1:len
-    clearvars -except srdir codefolder solvent len_i len allnames condition
+    clearvars -except srdir codefolder solvent len_i len allnames solvent
     datasetname=char(allnames(1,len_i));
-    datasetfile=load([srdir '\' datasetname]);
+    datasetfile=load([srdir '/' datasetname]);
     rowrange=datasetfile.dataset.rowrange;clearvars datasetfile
     disp('Finish load rowrange /n')    
     
     date=regexp(datasetname,'\d*2019','match');
     file=regexp(datasetname,'\dd\dd\d*','match');
     
-    cd([srdir '\apd full'])%apd file folder
+    cd([srdir '/apd full'])
     apdfile=dir(['*' date{1} '*' file{1} '.mat']);
     if isempty(apdfile)
         disp(['Wrong apd related to' datasetfile])
     else
         cd(codefolder)
         clearvars apddata apddataresolution
-        [apddata,apddataresolution]=PTUim([apdfile.folder '\' apdfile.name]);
+        [apddata,apddataresolution]=PTUim([apdfile.folder '/' apdfile.name]);
     end
     datasource=GetDandABS(apddata,0,'M');
     absolutetime=datasource(:,1);
@@ -58,7 +58,7 @@ for len_i=1:1:len
        end
     end
     
-cd([srdir '\apd full'])
-save([condition ' ' date{1} ' SecDtime ' file{1} '.mat'],'SecDtime');   
+cd([srdir '/apd full'])
+save([solvent ' ' date{1} ' SecDtime ' file{1} '.mat'],'SecDtime');   
     
 end
