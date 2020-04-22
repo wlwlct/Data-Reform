@@ -9,18 +9,17 @@ solvent='MEH_CH';
 srdir=['/scratch/lwang74/PTU_spectrum_lifetime_bluehive/PTUdata/' solvent];
 %srdir=['E:\F8T2N2'];
 cd (srdir)
-
-
-allnames=struct2cell(dir( '*2019*.mat'));
+year='2019';
+allnames=struct2cell(dir( ['*' year '*.mat']));
 [~,len]=size(allnames);
 for len_i=1:1:len
-    clearvars -except srdir codefolder solvent len_i len allnames solvent
+    clearvars -except srdir codefolder solvent len_i len allnames solvent year
     datasetname=char(allnames(1,len_i));
     datasetfile=load([srdir '/' datasetname]);
     rowrange=datasetfile.dataset.rowrange;clearvars datasetfile
     disp('Finish load rowrange /n')    
     
-    date=regexp(datasetname,'\d*2019','match');
+    date=regexp(datasetname,['\d*' year], 'match');
     file=regexp(datasetname,'\dd\dd\d*','match');
     
     cd([srdir '/apd full'])
