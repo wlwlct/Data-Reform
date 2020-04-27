@@ -2,8 +2,7 @@
 %is plotted. the origin data is from dataset.
 
 clearvars; close all;
-letter_char=num2cell(1:120);
-letter_box=cell(1,120);
+letter_char=num2cell(1:120);letter_box=cell(1,120);
 for i=1:120
     if i<=26
         letter_box{1,i}=char(64+letter_char{1,i});
@@ -26,37 +25,19 @@ for properfolder_i=1:1:properfolder_leng
     cd(pathname)
     files=dir('*dataset*.mat');
     files_leng=length(files);
-
-    Ex=actxserver('Excel.Application');
-    Exwokbook=Ex.Workbooks.Add;
-    Ex.Visible=1;
-    Exsheets=Ex.ActiveWorkbook.Sheets;
-    Firstsheet=Exsheets.get('Item',1);
-    Firstsheet.Activate
-    %write in folder names
     p=strfind(pathname,'\');
-    foldername=pathname(p(1,end)+1:length(pathname));
-    Folderrange=get(Ex.ActiveSheet,'Range',['A2:A' num2str(files_leng+1)]);
-    Folderrange.Value=foldername;
-    %title=[{'Pathname'},{'Foldername'},{'Match Plot'},{'Normalized CCD and AveWl'},{'CCD, Int, Lf'},{'NewCCD, Int, Lf'},{'10 sec normalized'}];
-    T=[{'Pathname'},{'Foldername'},{'Match plot'},{'State Separate'},{'Spectra Different Range'}];
-    Titlerange=get(Ex.ActiveSheet,'Range','A1:E1');
-    Titlerange.Value=T;
-    dpi = get(groot, 'ScreenPixelsPerInch');  % Get screen dpi
-    picrange=get(Ex.ActiveSheet,'Range',['B1:J' num2str(files_leng+1)]);
-    picrange.ColumnWidth=50;
-    picrange.RowHeight=100;
-
+    foldername=pathname(p(1,end)+1:length(pathname));  
+    [Ex,Exwokbook,Exsheets,Firstsheet,picrange,dpi]=Exl_prepare(files_leng,foldername);
+    
     n=0;
-    molecules_CND=cell(files_leng,2);
+    molecules_CND=cell(files_leng,3);
     for files_i=2:1:files_leng+1
         filename=files(files_i-1).name;
         pathname=files(files_i-1).folder;
         regularexp='\d*d\d*d\d*.mat';
         T=regexp(filename,regularexp);
         Generalname=filename(T:end-4);
-
-        %try and catch to load eberything that is possible
+        %try and catch to load everything that is possible
         try
             datasetfile=importdata([pathname '\' filename]);
         catch
@@ -80,6 +61,8 @@ for properfolder_i=1:1:properfolder_leng
         loc=loc(:,loc(1,:)<=loc(2,:));
         F_leng=length(loc(1,:));    
         
+        molecules_CND{files_i-1,3}=(loc(2,:)-loc(1,:))+1;
+        
         molecules_CND{files_i-1,1}=zeros(100-place+1,F_leng);
         try
             for F_leng_i=1:F_leng
@@ -90,8 +73,7 @@ for properfolder_i=1:1:properfolder_leng
         end
         molecules_CND{files_i-1,2}=diff(molecules_CND{files_i-1,1},1,2);
         
-        
-                %%
+        %%
         %plot matchplot if possible
         try
             figure
@@ -105,17 +87,7 @@ for properfolder_i=1:1:properfolder_leng
         end
         %save the plot
         n=n+1;
-        print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-        '-clipboard', '-dbitmap');
-        % print(gcf,'-clipboard', '-dbitmap');
-        pause (0.5);
-        Ex.ActiveSheet.Range(['C' num2str(files_i)]).PasteSpecial();
-        Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-        Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['C' num2str(files_i)]).Width;    %Adjusting width
-        Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['C' num2str(files_i)]).Height;  %Adjusting height
-        Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-        close(gcf);
-
+        Exl_plot('C',files_i,n,Ex,dpi)
         %%
 %plot match potential plot
         try
@@ -138,17 +110,7 @@ for properfolder_i=1:1:properfolder_leng
         end
         %save the plot
         n=n+1;
-        print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-        '-clipboard', '-dbitmap');
-        % print(gcf,'-clipboard', '-dbitmap');
-        pause (0.5);
-        Ex.ActiveSheet.Range(['D' num2str(files_i)]).PasteSpecial();
-        Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-        Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['D' num2str(files_i)]).Width;    %Adjusting width
-        Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['D' num2str(files_i)]).Height;  %Adjusting height
-        Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-        close(gcf);
-        
+        Exl_plot('D',files_i,n,Ex,dpi)      
         %%
 %plot into change of the spectrum
         for F_leng_i =1:F_leng-1
@@ -164,17 +126,7 @@ for properfolder_i=1:1:properfolder_leng
             legend;title([num2str(loc(1,F_leng_i)) ' to ' num2str(loc(1,F_leng_i+1))]);
             %write into excel %save the plot
             n=n+1;
-            print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-            '-clipboard', '-dbitmap');
-            % print(gcf,'-clipboard', '-dbitmap');
-            pause (0.5);
-            Ex.ActiveSheet.Range([letter_box{1,4+F_leng_i} num2str(files_i)]).PasteSpecial();
-            Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-            Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range([letter_box{1,4+F_leng_i} num2str(files_i)]).Width;    %Adjusting width
-            Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range([letter_box{1,4+F_leng_i} num2str(files_i)]).Height;  %Adjusting height
-            Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-            close(gcf);
-            
+            Exl_plot(letter_box{1,4+F_leng_i},files_i,n,Ex,dpi)     
         end
  end
 %%
@@ -182,4 +134,33 @@ save([pathname '\' foldername ' molecules_CND.mat'],'molecules_CND')
 SaveAs(Exwokbook,[pathname '\' foldername ' Change Int.xlsx']);
 Close(Exwokbook)
 Quit(Ex)
+end
+
+function [Ex,Exwokbook,Exsheets,Firstsheet,picrange,dpi]=Exl_prepare(files_leng,foldername)
+    Ex=actxserver('Excel.Application');
+    Exwokbook=Ex.Workbooks.Add;
+    Ex.Visible=1;
+    Exsheets=Ex.ActiveWorkbook.Sheets;
+    Firstsheet=Exsheets.get('Item',1);
+    Firstsheet.Activate
+    %write in folder names
+    Folderrange=get(Ex.ActiveSheet,'Range',['A2:A' num2str(files_leng+1)]);
+    Folderrange.Value=foldername;
+    T=[{'Pathname'},{'Foldername'},{'Match plot'},{'State Separate'},{'Spectra Different Range'}];
+    Titlerange=get(Ex.ActiveSheet,'Range','A1:E1');
+    Titlerange.Value=T;
+    dpi = get(groot, 'ScreenPixelsPerInch');  % Get screen dpi
+    picrange=get(Ex.ActiveSheet,'Range',['B1:J' num2str(files_leng+1)]);
+    picrange.ColumnWidth=50;
+    picrange.RowHeight=100;
+end
+function Exl_plot(letter,files_i,n,Ex,dpi)
+    print(gcf, sprintf('-r%d', dpi),'-clipboard', '-dbitmap');
+    pause (0.5);
+    Ex.ActiveSheet.Range([letter num2str(files_i)]).PasteSpecial();
+    Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
+    Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range([letter num2str(files_i)]).Width;    %Adjusting width
+    Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range([letter num2str(files_i)]).Height;  %Adjusting height
+    Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
+    close(gcf);
 end
