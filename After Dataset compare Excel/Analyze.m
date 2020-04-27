@@ -2,6 +2,7 @@ clearvars -except molecules_CND wl
 codefolder='C:\Users\Livi\Documents\GitHub\Data-Reform\After Dataset compare Excel';
 edges=450:1:670;
 Folder='E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\change int';
+lim=[450 650];
 % Plot_inc_dec(molecules_CND,wl,edges,codefolder)
 
 wl_leng=length(wl(:,1));
@@ -56,20 +57,26 @@ decrease_xl=cellfun(@num2str,num2cell(decrease_xl),'UniformOutput',false);
 figure;
 subplot(1,3,1);mesh(1:length(decrease_current_mesh(1,:)),wl,normalize(decrease_current_mesh,1,'range'));view([0 0 1]);colormap(jet);title('Decrease Current');
 ylabel('Wavelength (nm)');xticks(1:10:length(decrease_current_mesh(1,:)));xticklabels(decrease_xl(1:10:end));
+xlim([450 650])
 subplot(1,3,2);mesh(1:length(decrease_current_mesh(1,:)),wl,normalize(decrease_next_mesh,1,'range'));view([0 0 1]);colormap(jet);title('Decrease Next');
 ylabel('Wavelength (nm)');xticks(1:10:length(decrease_current_mesh(1,:)));xticklabels(decrease_xl(1:10:end));
+xlim([450 650])
 subplot(1,3,3);mesh(1:length(decrease_current_mesh(1,:)),wl,normalize(decrease_diff_mesh,1,'range'));view([0 0 1]);colormap(jet);title('Decrease Diff');
 ylabel('Wavelength (nm)');xticks(1:10:length(decrease_current_mesh(1,:)));xticklabels(decrease_xl(1:10:end));
+xlim([450 650])
 % title('decrease')
 
 %figure('Position',[2582,1003,1440,385]);
 figure;
 subplot(1,3,1);mesh(1:length(increase_current_mesh(1,:)),wl,normalize(increase_current_mesh,1,'range'));view([0 0 1]);colormap(jet);title('increase Current');
 ylabel('Wavelength (nm)');xticks(1:10:length(increase_current_mesh(1,:)));xticklabels(increase_xl(1:10:end));
+xlim([450 650])
 subplot(1,3,2);mesh(1:length(increase_current_mesh(1,:)),wl,normalize(increase_next_mesh,1,'range'));view([0 0 1]);colormap(jet);title('increase Next');
 ylabel('Wavelength (nm)');xticks(1:10:length(increase_current_mesh(1,:)));xticklabels(increase_xl(1:10:end));
+xlim([450 650])
 subplot(1,3,3);mesh(1:length(increase_current_mesh(1,:)),wl,normalize(increase_diff_mesh,1,'range'));view([0 0 1]);colormap(jet);title('increase Diff');
 ylabel('Wavelength (nm)');xticks(1:10:length(increase_current_mesh(1,:)));xticklabels(increase_xl(1:10:end));
+xlim([450 650])
 % title('increase')
 
 % %Increase calculation order by diff
