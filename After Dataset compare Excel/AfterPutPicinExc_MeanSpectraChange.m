@@ -4,9 +4,9 @@
 clearvars; close all;
 codefolder=pwd;
 %For my file need to change Generalname etc.;
-folderlocation='E:\';
+folderlocation='E:\MEH substrate clean mat data\';
 cd(folderlocation);
-properfolder=dir('*F8T2400nmCH');
+properfolder=dir('*MEH_Chloroform_rmBG');
 properfolder_leng=length(properfolder);
 place=1;
 for properfolder_i=1:1:properfolder_leng

@@ -1,12 +1,11 @@
 %1. write the spetra goes down and up, arange spectra side by side
-%2. record the time the spectra goes to photo bleach and come back,
-%summarizd as oxidation time.
-clearvars
-molecules_CND=load('E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\MEH_Chloroform_rmBG molecules_CND.mat')
+clearvars;
+solvent='MEH_CH_Clear';
+molecules_CND=load('E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\MEH_Chloroform_rmBG molecules_CND.mat');
 wl=molecules_CND.wl;molecules_CND=molecules_CND.molecules_CND;
 codefolder='C:\Users\Livi\Documents\GitHub\Data-Reform\After Dataset compare Excel';
 edges=450:1:670;
-Folder='E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\change int';
+Folder='E:\MEH substrate clean mat data\MEH_Chloroform_rmBG';
 lim=[450 650];
 % Plot_inc_dec(molecules_CND,wl,edges,codefolder)
 
@@ -45,88 +44,103 @@ molecules_current_increase=molecules_current(:,increase_loc);
 molecules_next_increase=molecules_next(:,increase_loc);
 
 %Increase calculation order by diff
-[increase_diff_prepare,increase_current_prepare,increase_next_prepare]=Spectra_prepare_noOrder(molecules_Diff_increase,molecules_current_increase,molecules_next_increase,wl,edges);
+[increase_diff_prepare,increase_current_prepare,increase_next_prepare]=Spectra_prepare(molecules_Diff_increase,molecules_current_increase,molecules_next_increase,wl,edges);
 [increase_diff_mesh,increase_xl]=PreparePlot(increase_diff_prepare,edges,wl);
 increase_current_mesh=PreparePlot(increase_current_prepare,edges,wl);
 increase_next_mesh=PreparePlot(increase_next_prepare,edges,wl);
 increase_xl=cellfun(@num2str,num2cell(increase_xl),'UniformOutput',false);
 %Decrease calculation order by diff
-[decrease_diff_prepare,decrease_current_prepare,decrease_next_prepare]=Spectra_prepare_noOrder(molecules_Diff_decrease,molecules_current_decrease,molecules_next_decrease,wl,edges);
+[decrease_diff_prepare,decrease_current_prepare,decrease_next_prepare]=Spectra_prepare(molecules_Diff_decrease,molecules_current_decrease,molecules_next_decrease,wl,edges);
 [decrease_diff_mesh,decrease_xl]=PreparePlot(decrease_diff_prepare,edges,wl);
 decrease_current_mesh=PreparePlot(decrease_current_prepare,edges,wl);
 decrease_next_mesh=PreparePlot(decrease_next_prepare,edges,wl);
 decrease_xl=cellfun(@num2str,num2cell(decrease_xl),'UniformOutput',false);
 
+[increase_diff_prepare_NO,increase_current_prepare_NO,increase_next_prepare_NO]=Spectra_prepare_noOrder(molecules_Diff_increase,molecules_current_increase,molecules_next_increase,wl);
+[decrease_diff_prepare_NO,decrease_current_prepare_NO,decrease_next_prepare_NO]=Spectra_prepare_noOrder(molecules_Diff_decrease,molecules_current_decrease,molecules_next_decrease,wl);
 
-%figure('Position',[2582,1003,1440,385]);
-figure;
+figure('Position',[2582,1003,1440,385]);
+%figure;
 subplot(1,3,1);mesh(1:length(decrease_current_mesh(1,:)),wl,normalize(decrease_current_mesh,1,'range'));view([0 0 1]);colormap(jet);title('Decrease Current');
 ylabel('Wavelength (nm)');xticks(1:10:length(decrease_current_mesh(1,:)));xticklabels(decrease_xl(1:10:end));
-xlim([450 650])
 subplot(1,3,2);mesh(1:length(decrease_current_mesh(1,:)),wl,normalize(decrease_next_mesh,1,'range'));view([0 0 1]);colormap(jet);title('Decrease Next');
 ylabel('Wavelength (nm)');xticks(1:10:length(decrease_current_mesh(1,:)));xticklabels(decrease_xl(1:10:end));
-xlim([450 650])
 subplot(1,3,3);mesh(1:length(decrease_current_mesh(1,:)),wl,normalize(decrease_diff_mesh,1,'range'));view([0 0 1]);colormap(jet);title('Decrease Diff');
 ylabel('Wavelength (nm)');xticks(1:10:length(decrease_current_mesh(1,:)));xticklabels(decrease_xl(1:10:end));
-xlim([450 650])
+saveas(gcf,[solvent ' decrease order by max spectra.fig'])
+saveas(gcf,[solvent ' decrease order by max spectra.jpg'])
+close all
 % title('decrease')
 
-%figure('Position',[2582,1003,1440,385]);
-figure;
+figure('Position',[2582,1003,1440,385]);
+%figure;
 subplot(1,3,1);mesh(1:length(increase_current_mesh(1,:)),wl,normalize(increase_current_mesh,1,'range'));view([0 0 1]);colormap(jet);title('increase Current');
 ylabel('Wavelength (nm)');xticks(1:10:length(increase_current_mesh(1,:)));xticklabels(increase_xl(1:10:end));
-xlim([450 650])
 subplot(1,3,2);mesh(1:length(increase_current_mesh(1,:)),wl,normalize(increase_next_mesh,1,'range'));view([0 0 1]);colormap(jet);title('increase Next');
 ylabel('Wavelength (nm)');xticks(1:10:length(increase_current_mesh(1,:)));xticklabels(increase_xl(1:10:end));
-xlim([450 650])
 subplot(1,3,3);mesh(1:length(increase_current_mesh(1,:)),wl,normalize(increase_diff_mesh,1,'range'));view([0 0 1]);colormap(jet);title('increase Diff');
 ylabel('Wavelength (nm)');xticks(1:10:length(increase_current_mesh(1,:)));xticklabels(increase_xl(1:10:end));
-xlim([450 650])
+saveas(gcf,[solvent ' increase order by max spectra.fig'])
+saveas(gcf,[solvent ' increase order by max spectra.jpg'])
+close all
 % title('increase')
 
-% %Increase calculation order by diff
-% molecules_Diff_increase=rmLowInt(molecules_Diff_increase,codefolder);
-% [increase_diff_prepare,increase_current_prepare,increase_next_prepare]=Spectra_prepare(molecules_Diff_increase,molecules_current_increase,molecules_next_increase,wl,edges);
-% increase_diff_mesh=PreparePlot(increase_diff_prepare,edges,wl);
-% increase_current_mesh=PreparePlot(increase_current_prepare,edges,wl);
-% increase_next_mesh=PreparePlot(increase_next_prepare,edges,wl);
-% %Decrease calculation order by diff
-% molecules_Diff_decrease=rmLowInt(molecules_Diff_decrease,codefolder);
-% [decrease_diff_prepare,decrease_current_prepare,decrease_next_prepare]=Spectra_prepare(molecules_Diff_decrease,molecules_current_decrease,molecules_next_decrease,wl,edges);
-% decrease_diff_mesh=PreparePlot(decrease_diff_prepare,edges,wl);
-% decrease_current_mesh=PreparePlot(decrease_current_prepare,edges,wl);
-% decrease_next_mesh=PreparePlot(decrease_next_prepare,edges,wl);
+figure('Position',[2582,1003,1440,385]);
+%figure;
+subplot(1,3,1);surfme(decrease_current_prepare_NO,wl,solvent,'decrease')
+subplot(1,3,2);surfme(decrease_next_prepare_NO,wl,solvent,'decrease')
+subplot(1,3,3);surfme(decrease_diff_prepare_NO,wl,solvent,'decrease')
+cd(Folder)
+saveas(gcf,[solvent ' decrease (all).fig'])
+saveas(gcf,[solvent ' decrease (all).jpg'])
+close all
+% title('decrease')
+
+figure('Position',[2582,1003,1440,385]);
+subplot(1,3,1);surfme(increase_current_prepare_NO,wl,solvent,'increase')
+subplot(1,3,2);surfme(increase_next_prepare_NO,wl,solvent,'increase')
+subplot(1,3,3);surfme(increase_diff_prepare_NO,wl,solvent,'increase')
+cd(Folder)
+saveas(gcf,[solvent ' increase (all).fig'])
+saveas(gcf,[solvent ' increase (all).jpg'])
+close all
+
 
 %%
 %plot everything in the decrease and increase mesh
-figure;
-sta='decrease';
-eval(['M=' sta '_diff_mesh;']);
-eval(['l=' sta '_xl;']);
-mesh_leng=length(M(1,:));
-% for i=1:1:mesh_leng;
-%     hold on;plot(wl,normalize(M(:,i),1,'range'),'LineWidth',3,'DisplayName',l{1,i});
-% end;
-
-close all
-flag=1;
-for mesh_leng_i=1:mesh_leng
-    ceil_num=ceil(mesh_leng_i/4);
-    if flag~=ceil_num
-        flag=ceil_num;
-        legend;xlabel('Wavelength (nm)');ylabel('Normalized Intensity')
-        cd(Folder)
-        saveas(gcf,['MEH CH Clear' ' current spectra' num2str(flag) '.jpg']);
-        saveas(gcf,['MEH CH Clear' ' current spectra' num2str(flag) '.fig']);
-        close gcf
-    end
-    figure(ceil_num)
-    hold on;plot(wl,normalize(M(:,mesh_leng_i),1,'range'),'LineWidth',3,'DisplayName',l{1,mesh_leng_i});
-    title(['MEH CH Clear ' sta 'spectra sort by wavelength at peak maxima'])
-end
+% figure;
+% sta='decrease';
+% eval(['M=' sta '_diff_mesh;']);
+% eval(['l=' sta '_xl;']);
+% mesh_leng=length(M(1,:));
+% % for i=1:1:mesh_leng;
+% %     hold on;plot(wl,normalize(M(:,i),1,'range'),'LineWidth',3,'DisplayName',l{1,i});
+% % end;
+% 
+% close all
+% flag=1;
+% for mesh_leng_i=1:mesh_leng
+%     ceil_num=ceil(mesh_leng_i/4);
+%     if flag~=ceil_num
+%         flag=ceil_num;
+%         legend;xlabel('Wavelength (nm)');ylabel('Normalized Intensity')
+%         cd(Folder)
+%         saveas(gcf,['MEH CH Clear' ' current spectra' num2str(flag) '.jpg']);
+%         saveas(gcf,['MEH CH Clear' ' current spectra' num2str(flag) '.fig']);
+%         close gcf
+%     end
+%     figure(ceil_num)
+%     hold on;plot(wl,normalize(M(:,mesh_leng_i),1,'range'),'LineWidth',3,'DisplayName',l{1,mesh_leng_i});
+%     title(['MEH CH Clear ' sta 'spectra sort by wavelength at peak maxima'])
+% end
 
 
 %%
+function surfme(data,wl,solvent,stat)
+surf(1:length(data(1,:)),wl,normalize(data,1,'range'),'EdgeColor','none');
+view([0 0 1]);colormap(jet);title([solvent ' ' stat ' Current']);
+ylabel('Wavelength (nm)');
+end
 
 function FE(molecules_CND)
 CND_leng=length(molecules_CND(:,1)); 
