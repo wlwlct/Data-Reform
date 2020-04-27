@@ -1,4 +1,9 @@
-clearvars -except molecules_CND wl
+%1. write the spetra goes down and up, arange spectra side by side
+%2. record the time the spectra goes to photo bleach and come back,
+%summarizd as oxidation time.
+clearvars
+molecules_CND=load('E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\MEH_Chloroform_rmBG molecules_CND.mat')
+wl=molecules_CND.wl;molecules_CND=molecules_CND.molecules_CND;
 codefolder='C:\Users\Livi\Documents\GitHub\Data-Reform\After Dataset compare Excel';
 edges=450:1:670;
 Folder='E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\change int';
@@ -40,13 +45,13 @@ molecules_current_increase=molecules_current(:,increase_loc);
 molecules_next_increase=molecules_next(:,increase_loc);
 
 %Increase calculation order by diff
-[increase_diff_prepare,increase_current_prepare,increase_next_prepare]=Spectra_prepare(molecules_Diff_increase,molecules_current_increase,molecules_next_increase,wl,edges);
+[increase_diff_prepare,increase_current_prepare,increase_next_prepare]=Spectra_prepare_noOrder(molecules_Diff_increase,molecules_current_increase,molecules_next_increase,wl,edges);
 [increase_diff_mesh,increase_xl]=PreparePlot(increase_diff_prepare,edges,wl);
 increase_current_mesh=PreparePlot(increase_current_prepare,edges,wl);
 increase_next_mesh=PreparePlot(increase_next_prepare,edges,wl);
 increase_xl=cellfun(@num2str,num2cell(increase_xl),'UniformOutput',false);
 %Decrease calculation order by diff
-[decrease_diff_prepare,decrease_current_prepare,decrease_next_prepare]=Spectra_prepare(molecules_Diff_decrease,molecules_current_decrease,molecules_next_decrease,wl,edges);
+[decrease_diff_prepare,decrease_current_prepare,decrease_next_prepare]=Spectra_prepare_noOrder(molecules_Diff_decrease,molecules_current_decrease,molecules_next_decrease,wl,edges);
 [decrease_diff_mesh,decrease_xl]=PreparePlot(decrease_diff_prepare,edges,wl);
 decrease_current_mesh=PreparePlot(decrease_current_prepare,edges,wl);
 decrease_next_mesh=PreparePlot(decrease_next_prepare,edges,wl);
@@ -156,6 +161,22 @@ function spectra1=rmLowInt(spectra,codefolder)
     spectra(end-5:end,spectra_stage_ratio<1.3)=1000+max_int;
     spectra1=spectra;
 end
+
+
+function [spc_diff_prepare,spc_current_prepare,spc_next_prepare]=Spectra_prepare_noOrder(Spectra_Diff,Spectra_current,Spectra_Next,wl)
+%change of the spectrum, increase or decrease; plot current and next along
+%with difference of spectrum
+    [Spectra_Diff_zong,Spectra_Diff_heng]=size(Spectra_Diff);
+    [~,spectramax_smooth_loc]=max(smoothdata(Spectra_Diff,1,'gaussian',8),[],1);
+    spc_max_smooth=transpose(wl(spectramax_smooth_loc,1));
+%Order by the change of the diff of the spectrum   
+    [~,spc_max_smooth_sort]=sort(spc_max_smooth);
+    spc_diff_prepare=Spectra_Diff(:,spc_max_smooth_sort);
+    spc_current_prepare=Spectra_current(:,spc_max_smooth_sort);
+    spc_next_prepare=Spectra_Next(:,spc_max_smooth_sort);
+end
+
+
 function [spc_diff_prepare,spc_current_prepare,spc_next_prepare]=Spectra_prepare(Spectra_Diff,Spectra_current,Spectra_Next,wl,edges)
 %change of the spectrum, increase or decrease; plot current and next along
 %with difference of spectrum
