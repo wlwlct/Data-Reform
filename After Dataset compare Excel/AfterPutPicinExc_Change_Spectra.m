@@ -1,8 +1,6 @@
 %Under the main direction, [apd/ccd int; mesh ccd with int,ave el; mesh newccd with lf; normalized dtime along time.]
 %is plotted. the origin data is from dataset.
 
-
-
 clearvars; close all;
 letter_char=num2cell(1:120);
 letter_box=cell(1,120);
@@ -16,9 +14,9 @@ end
 
 codefolder=pwd;
 %For my file need to change Generalname etc.;
-folderlocation='E:\';
+folderlocation='E:\MEH substrate clean mat data\';
 cd(folderlocation);
-solvent='F8T2N2High';
+solvent='MEH_Chloroform_rmBG';
 properfolder=dir(['*' solvent]);
 properfolder_leng=length(properfolder);
 place=22;
