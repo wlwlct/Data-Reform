@@ -1,11 +1,11 @@
 %1. write the spetra goes down and up, arange spectra side by side
 clearvars;
-solvent='MEH_CH_Clear';
-molecules_CND=load('E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\MEH_Chloroform_rmBG molecules_CND.mat');
+solvent='MEH_CH_clear';
+molecules_CND=load('E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\change int\MEH_Chloroform_rmBG molecules_CND.mat');
 wl=molecules_CND.wl;molecules_CND=molecules_CND.molecules_CND;
 codefolder='C:\Users\Livi\Documents\GitHub\Data-Reform\After Dataset compare Excel';
 edges=450:1:670;
-Folder='E:\MEH substrate clean mat data\MEH_Chloroform_rmBG';
+Folder='E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\change int';
 lim=[450 650];
 % Plot_inc_dec(molecules_CND,wl,edges,codefolder)
 
@@ -87,9 +87,9 @@ close all
 
 figure('Position',[2582,1003,1440,385]);
 %figure;
-subplot(1,3,1);surfme(decrease_current_prepare_NO,wl,solvent,'decrease')
-subplot(1,3,2);surfme(decrease_next_prepare_NO,wl,solvent,'decrease')
-subplot(1,3,3);surfme(decrease_diff_prepare_NO,wl,solvent,'decrease')
+subplot(1,3,1);surfme(decrease_current_prepare_NO,wl,solvent,'decrease','current')
+subplot(1,3,2);surfme(decrease_next_prepare_NO,wl,solvent,'decrease','next')
+subplot(1,3,3);surfme(decrease_diff_prepare_NO,wl,solvent,'decrease','diff')
 cd(Folder)
 saveas(gcf,[solvent ' decrease (all).fig'])
 saveas(gcf,[solvent ' decrease (all).jpg'])
@@ -97,48 +97,20 @@ close all
 % title('decrease')
 
 figure('Position',[2582,1003,1440,385]);
-subplot(1,3,1);surfme(increase_current_prepare_NO,wl,solvent,'increase')
-subplot(1,3,2);surfme(increase_next_prepare_NO,wl,solvent,'increase')
-subplot(1,3,3);surfme(increase_diff_prepare_NO,wl,solvent,'increase')
+subplot(1,3,1);surfme(increase_current_prepare_NO,wl,solvent,'increase','current')
+subplot(1,3,2);surfme(increase_next_prepare_NO,wl,solvent,'increase','next')
+subplot(1,3,3);surfme(increase_diff_prepare_NO,wl,solvent,'increase','diff')
 cd(Folder)
 saveas(gcf,[solvent ' increase (all).fig'])
 saveas(gcf,[solvent ' increase (all).jpg'])
 close all
 
 
-%%
-%plot everything in the decrease and increase mesh
-% figure;
-% sta='decrease';
-% eval(['M=' sta '_diff_mesh;']);
-% eval(['l=' sta '_xl;']);
-% mesh_leng=length(M(1,:));
-% % for i=1:1:mesh_leng;
-% %     hold on;plot(wl,normalize(M(:,i),1,'range'),'LineWidth',3,'DisplayName',l{1,i});
-% % end;
-% 
-% close all
-% flag=1;
-% for mesh_leng_i=1:mesh_leng
-%     ceil_num=ceil(mesh_leng_i/4);
-%     if flag~=ceil_num
-%         flag=ceil_num;
-%         legend;xlabel('Wavelength (nm)');ylabel('Normalized Intensity')
-%         cd(Folder)
-%         saveas(gcf,['MEH CH Clear' ' current spectra' num2str(flag) '.jpg']);
-%         saveas(gcf,['MEH CH Clear' ' current spectra' num2str(flag) '.fig']);
-%         close gcf
-%     end
-%     figure(ceil_num)
-%     hold on;plot(wl,normalize(M(:,mesh_leng_i),1,'range'),'LineWidth',3,'DisplayName',l{1,mesh_leng_i});
-%     title(['MEH CH Clear ' sta 'spectra sort by wavelength at peak maxima'])
-% end
-
 
 %%
-function surfme(data,wl,solvent,stat)
+function surfme(data,wl,solvent,stat,current)
 surf(1:length(data(1,:)),wl,normalize(data,1,'range'),'EdgeColor','none');
-view([0 0 1]);colormap(jet);title([solvent ' ' stat ' Current']);
+view([0 0 1]);colormap(jet);title([solvent ' ' stat ' ' current]);
 ylabel('Wavelength (nm)');
 end
 
