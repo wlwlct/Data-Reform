@@ -1,11 +1,11 @@
 %1. write the spetra goes down and up, arange spectra side by side
 clearvars;
-solvent='F8T2SMS400';
-molecules_CND=load('E:\F8T2400nmCH\F8T2 400nm Change Int\F8T2400nmCH molecules_CND.mat');
+solvent='F8T2N2High';
+molecules_CND=load('E:\F8T2N2High\intensity change without remove 0204 4d1d1\F8T2HightInt change Int\F8T2N2High molecules_CND.mat');
 wl=molecules_CND.wl;molecules_CND=molecules_CND.molecules_CND;
 codefolder='C:\Users\Livi\Documents\GitHub\Data-Reform\After Dataset compare Excel';
 edges=450:1:670;
-Folder='E:\F8T2400nmCH\F8T2 400nm Change Int';
+Folder='E:\F8T2N2High\intensity change without remove 0204 4d1d1\F8T2HightInt change Int';
 % Plot_inc_dec(molecules_CND,wl,edges,codefolder)
 
 wl_leng=length(wl(:,1));
@@ -84,6 +84,7 @@ try
         eval([stat{fig_i,1} '_shift_diff=' stat{fig_i,1} '_shift_diff(:,loc);']);
         eval([stat{fig_i,1} '_shift_current=' stat{fig_i,1} '_shift_current(:,loc);']);
         eval([stat{fig_i,1} '_shift_next=' stat{fig_i,1} '_shift_next(:,loc);']);
+        eval([stat{fig_i,1} '_shi_v=' stat{fig_i,1} '_shi_v(1,loc);']);
     end
 catch
     disp('could not use Spectra_prepare')
@@ -129,23 +130,24 @@ try
         close all
         
         %For shift plot
-        figure('Position',[2582,1003,1440,385]);
+        figure('Position',[2582,1003,1440,385]);clearvars shi_leng
+        eval(['shi_leng=length(' stat{fig_i,1} '_shi_v(1,:));'])
         %figure;
         subplot(1,3,1)        
-        yyaxis left; surfme(eval([stat{fig_i,1} '_shift_diff']),wl,solvent,stat{fig_i,1},'Mean diff');
-        yyaxis right; eval(['s=scatter3(1:loc_leng,' stat{fig_i,1} '_shi_v(loc),ones(1,loc_leng)*2);']);
+        yyaxis left; surfme(eval([stat{fig_i,1} '_shift_diff']),1:shi_leng,wl,solvent,stat{fig_i,1},'Mean diff');
+        yyaxis right; eval(['s=scatter3(1:shi_leng,' stat{fig_i,1} '_shi_v,ones(1,shi_leng)*2);']);
         co=s.MarkerEdgeColor;s.MarkerFaceColor=co;
         
         subplot(1,3,2)        
         yyaxis left;
-        surfme(eval([stat{fig_i,1} '_shift_current']),wl,solvent,stat{fig_i,1},'Mean current');
-        yyaxis right; eval(['s=scatter3(1:loc_leng,' stat{fig_i,1} '_shi_v(loc),ones(1,loc_leng)*2);']);
+        surfme(eval([stat{fig_i,1} '_shift_current']),1:shi_leng,wl,solvent,stat{fig_i,1},'Mean current');
+        yyaxis right; eval(['s=scatter3(1:shi_leng,' stat{fig_i,1} '_shi_v,ones(1,shi_leng)*2);']);
         co=s.MarkerEdgeColor;s.MarkerFaceColor=co;
         
         subplot(1,3,3)        
         yyaxis left;
-        surfme(eval([stat{fig_i,1} '_shift_next']),wl,solvent,stat{fig_i,1},'Mean next');
-        yyaxis right; eval(['s=scatter3(1:loc_leng,' stat{fig_i,1} '_shi_v(loc),ones(1,loc_leng)*2);']);
+        surfme(eval([stat{fig_i,1} '_shift_next']),1:shi_leng,wl,solvent,stat{fig_i,1},'Mean next');
+        yyaxis right; eval(['s=scatter3(1:shi_leng,' stat{fig_i,1} '_shi_v,ones(1,shi_leng)*2);']);
         co=s.MarkerEdgeColor;s.MarkerFaceColor=co;
         
        cd(Folder)
