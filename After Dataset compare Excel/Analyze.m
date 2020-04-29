@@ -1,12 +1,11 @@
 %1. write the spetra goes down and up, arange spectra side by side
 clearvars;
-solvent='MEH_CH_clear';
+solvent='MEH_CH_Clear_chromophore';
 molecules_CND=load('E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\change int\MEH_Chloroform_rmBG molecules_CND.mat');
 wl=molecules_CND.wl;molecules_CND=molecules_CND.molecules_CND;
 codefolder='C:\Users\Livi\Documents\GitHub\Data-Reform\After Dataset compare Excel';
 edges=450:1:670;
 Folder='E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\change int';
-lim=[450 650];
 % Plot_inc_dec(molecules_CND,wl,edges,codefolder)
 
 wl_leng=length(wl(:,1));
@@ -16,6 +15,7 @@ for CND_leng_i=1:CND_leng;total_leng=total_leng+length(molecules_CND{CND_leng_i,
 molecules_Diff=zeros(wl_leng,total_leng);
 molecules_current=zeros(wl_leng,total_leng);
 molecules_next=zeros(wl_leng,total_leng);
+molecules_last=zeros(1,total_leng);
 
 current_column=1;
 for CND_leng_i=1:CND_leng
@@ -24,6 +24,7 @@ for CND_leng_i=1:CND_leng
     molecules_Diff(:,current_column:current_column+current_leng-1)=molecules_CND{CND_leng_i,2};
     molecules_current(:,current_column:current_column+current_leng-1)=molecules_CND{CND_leng_i,1}(:,1:current_leng);
     molecules_next(:,current_column:current_column+current_leng-1)=molecules_CND{CND_leng_i,1}(:,2:current_leng+1);
+    molecules_last(1,current_column:current_column+current_leng-1)=molecules_CND{CND_leng_i,3}(1:end-1);
     current_column=current_column+current_leng;
 end
 
@@ -38,82 +39,145 @@ increase_loc=find(s_diff>=0);
 molecules_Diff_decrease=molecules_Diff(:,decrease_loc)*(-1);
 molecules_current_decrease=molecules_current(:,decrease_loc);
 molecules_next_decrease=molecules_next(:,decrease_loc);
+molecules_last_decrease=molecules_last(1,decrease_loc);
 
 molecules_Diff_increase=molecules_Diff(:,increase_loc);
 molecules_current_increase=molecules_current(:,increase_loc);
 molecules_next_increase=molecules_next(:,increase_loc);
+molecules_last_increase=molecules_last(1,increase_loc);
 
-%Increase calculation order by diff
-[increase_diff_prepare,increase_current_prepare,increase_next_prepare]=Spectra_prepare(molecules_Diff_increase,molecules_current_increase,molecules_next_increase,wl,edges);
-[increase_diff_mesh,increase_xl]=PreparePlot(increase_diff_prepare,edges,wl);
-increase_current_mesh=PreparePlot(increase_current_prepare,edges,wl);
-increase_next_mesh=PreparePlot(increase_next_prepare,edges,wl);
-increase_xl=cellfun(@num2str,num2cell(increase_xl),'UniformOutput',false);
-%Decrease calculation order by diff
-[decrease_diff_prepare,decrease_current_prepare,decrease_next_prepare]=Spectra_prepare(molecules_Diff_decrease,molecules_current_decrease,molecules_next_decrease,wl,edges);
-[decrease_diff_mesh,decrease_xl]=PreparePlot(decrease_diff_prepare,edges,wl);
-decrease_current_mesh=PreparePlot(decrease_current_prepare,edges,wl);
-decrease_next_mesh=PreparePlot(decrease_next_prepare,edges,wl);
-decrease_xl=cellfun(@num2str,num2cell(decrease_xl),'UniformOutput',false);
+stat={'decrease';'increase'};
+try
+%calculation order by diff
+    for fig_i=1:2
+        clearvars D C L N D_prepare C_prepare N_prepare L_prepare
+        eval(['D=molecules_Diff_' stat{fig_i,1} ';']);eval(['C=molecules_current_' stat{fig_i,1} ';']);
+        eval(['N=molecules_next_' stat{fig_i,1} ';']);eval(['L=molecules_last_' stat{fig_i,1} ';']);
+        [D_prepare,C_prepare,N_prepare,L_prepare]=Spectra_prepare(D,C,N,L,wl,edges);
+        eval(['[' stat{fig_i,1} '_diff_mesh,' stat{fig_i,1} '_xl]=PreparePlot(D_prepare,edges,wl);']);
+        eval([stat{fig_i,1} '_current_mesh=PreparePlot(C_prepare,edges,wl);'])
+        eval([stat{fig_i,1} '_next_mesh=PreparePlot(N_prepare,edges,wl);']);
+        eval([stat{fig_i,1} '_xl=cellfun(@num2str,num2cell(' stat{fig_i,1} '_xl),' char(39) 'UniformOutput' char(39) ',false);']);
+        
+        %for mean plot
+        eval(['C_mean_' stat{fig_i,1} '=zeros(wl_leng,220);']);
+        eval(['D_mean_' stat{fig_i,1} '=zeros(wl_leng,220);']);
+        eval(['N_mean_' stat{fig_i,1} '=zeros(wl_leng,220);']);
+        eval(['L_mean_' stat{fig_i,1} '=zeros(1,220);']);
+        eval(['L_std_' stat{fig_i,1} '=zeros(1,220);']);
+        eval(['num_mean_' stat{fig_i,1} '=zeros(1,220);']);
+        for ii=1:220
+            if ~isempty(C_prepare{ii,1})
+                num_mean=length(C_prepare{ii,1});
+                eval(['C_mean_' stat{fig_i,1} '(:,ii)=mean(C_prepare{ii,1},2);']);
+                eval(['D_mean_' stat{fig_i,1} '(:,ii)=mean(D_prepare{ii,1},2);']);
+                eval(['N_mean_' stat{fig_i,1} '(:,ii)=mean(N_prepare{ii,1},2);']);
+                eval(['L_mean_' stat{fig_i,1} '(1,ii)=mean(L_prepare{ii,1},2);']);
+                eval(['L_std_' stat{fig_i,1} '(1,ii)=std(L_prepare{ii,1},0,2);']);
+                eval(['num_mean_' stat{fig_i,1} '(1,ii)=length(C_prepare{ii,1}(1,:));']);
+            end
+        end
+        
+        %for shift plot
+        eval(['[' stat{fig_i,1} '_shift_diff,' stat{fig_i,1} '_shift_current,' stat{fig_i,1} '_shift_next,~,' stat{fig_i,1} '_shi_v]=shift_distance(' stat{fig_i,1} '_diff_mesh,' stat{fig_i,1} '_current_mesh,' stat{fig_i,1} '_next_mesh,wl);'])
+        eval(['loc=find(abs(' stat{fig_i,1} '_shi_v)>=5);']);loc_leng=length(loc);
+        eval([stat{fig_i,1} '_shift_diff=' stat{fig_i,1} '_shift_diff(:,loc);']);
+        eval([stat{fig_i,1} '_shift_current=' stat{fig_i,1} '_shift_current(:,loc);']);
+        eval([stat{fig_i,1} '_shift_next=' stat{fig_i,1} '_shift_next(:,loc);']);
+    end
+catch
+    disp('could not use Spectra_prepare')
+end
 
-[increase_diff_prepare_NO,increase_current_prepare_NO,increase_next_prepare_NO]=Spectra_prepare_noOrder(molecules_Diff_increase,molecules_current_increase,molecules_next_increase,wl);
-[decrease_diff_prepare_NO,decrease_current_prepare_NO,decrease_next_prepare_NO]=Spectra_prepare_noOrder(molecules_Diff_decrease,molecules_current_decrease,molecules_next_decrease,wl);
-
-figure('Position',[2582,1003,1440,385]);
-%figure;
-subplot(1,3,1);mesh(1:length(decrease_current_mesh(1,:)),wl,normalize(decrease_current_mesh,1,'range'));view([0 0 1]);colormap(jet);title('Decrease Current');
-ylabel('Wavelength (nm)');xticks(1:10:length(decrease_current_mesh(1,:)));xticklabels(decrease_xl(1:10:end));
-subplot(1,3,2);mesh(1:length(decrease_current_mesh(1,:)),wl,normalize(decrease_next_mesh,1,'range'));view([0 0 1]);colormap(jet);title('Decrease Next');
-ylabel('Wavelength (nm)');xticks(1:10:length(decrease_current_mesh(1,:)));xticklabels(decrease_xl(1:10:end));
-subplot(1,3,3);mesh(1:length(decrease_current_mesh(1,:)),wl,normalize(decrease_diff_mesh,1,'range'));view([0 0 1]);colormap(jet);title('Decrease Diff');
-ylabel('Wavelength (nm)');xticks(1:10:length(decrease_current_mesh(1,:)));xticklabels(decrease_xl(1:10:end));
-saveas(gcf,[solvent ' decrease order by max spectra.fig'])
-saveas(gcf,[solvent ' decrease order by max spectra.jpg'])
-close all
-% title('decrease')
-
-figure('Position',[2582,1003,1440,385]);
-%figure;
-subplot(1,3,1);mesh(1:length(increase_current_mesh(1,:)),wl,normalize(increase_current_mesh,1,'range'));view([0 0 1]);colormap(jet);title('increase Current');
-ylabel('Wavelength (nm)');xticks(1:10:length(increase_current_mesh(1,:)));xticklabels(increase_xl(1:10:end));
-subplot(1,3,2);mesh(1:length(increase_current_mesh(1,:)),wl,normalize(increase_next_mesh,1,'range'));view([0 0 1]);colormap(jet);title('increase Next');
-ylabel('Wavelength (nm)');xticks(1:10:length(increase_current_mesh(1,:)));xticklabels(increase_xl(1:10:end));
-subplot(1,3,3);mesh(1:length(increase_current_mesh(1,:)),wl,normalize(increase_diff_mesh,1,'range'));view([0 0 1]);colormap(jet);title('increase Diff');
-ylabel('Wavelength (nm)');xticks(1:10:length(increase_current_mesh(1,:)));xticklabels(increase_xl(1:10:end));
-saveas(gcf,[solvent ' increase order by max spectra.fig'])
-saveas(gcf,[solvent ' increase order by max spectra.jpg'])
-close all
-% title('increase')
-
-figure('Position',[2582,1003,1440,385]);
-%figure;
-subplot(1,3,1);surfme(decrease_current_prepare_NO,wl,solvent,'decrease','current')
-subplot(1,3,2);surfme(decrease_next_prepare_NO,wl,solvent,'decrease','next')
-subplot(1,3,3);surfme(decrease_diff_prepare_NO,wl,solvent,'decrease','diff')
-cd(Folder)
-saveas(gcf,[solvent ' decrease (all).fig'])
-saveas(gcf,[solvent ' decrease (all).jpg'])
-close all
-% title('decrease')
-
-figure('Position',[2582,1003,1440,385]);
-subplot(1,3,1);surfme(increase_current_prepare_NO,wl,solvent,'increase','current')
-subplot(1,3,2);surfme(increase_next_prepare_NO,wl,solvent,'increase','next')
-subplot(1,3,3);surfme(increase_diff_prepare_NO,wl,solvent,'increase','diff')
-cd(Folder)
-saveas(gcf,[solvent ' increase (all).fig'])
-saveas(gcf,[solvent ' increase (all).jpg'])
-close all
+%plot all spectra sort by spectra
+try 
+    for fig_i=1:2
+        figure('Position',[[2852,1003,1170,858]]);
+        %figure;
+        clearvars C N D L
+        eval(['C=' stat{fig_i,1} '_current_mesh;']);eval(['N=' stat{fig_i,1} '_next_mesh;']);
+        eval(['D=' stat{fig_i,1} '_diff_mesh;']); eval(['L=molecules_last_' stat{fig_i,1} ';']);
+        subplot(2,2,1);surfme(C,wl,solvent,stat{fig_i,1},'Current');
+        xticks(1:20:length(C(1,:)));eval(['xticklabels(' stat{fig_i,1} '_xl(1:20:end));']);
+        subplot(2,2,2);surfme(N,wl,solvent,stat{fig_i,1},'Next')
+        xticks(1:20:length(C(1,:)));eval(['xticklabels(' stat{fig_i,1} '_xl(1:20:end));']);
+        subplot(2,2,3);surfme(D,wl,solvent,stat{fig_i,1},'Diff')
+        xticks(1:20:length(C(1,:)));eval(['xticklabels(' stat{fig_i,1} '_xl(1:20:end));']);
+        subplot(2,2,4);scatter(1:length(L),L);ylabel('last time (s)')
+        cd(Folder)
+        saveas(gcf,[solvent ' ' stat{fig_i,1} ' order by max spectra (all).fig'])
+        saveas(gcf,[solvent ' ' stat{fig_i,1} ' order by max spectra (all).jpg'])
+        close all
+ 
+        %plot mean spectra sort by spectra
+        figure('Position',[2852,1003,1170,858]);
+        %figure;
+        subplot(2,2,1);surfme(eval(['C_mean_' stat{fig_i,1}]),wl,solvent,stat{fig_i,1},'Mean Current');
+        subplot(2,2,2);surfme(eval(['N_mean_' stat{fig_i,1}]),wl,solvent,stat{fig_i,1},'Mean Next');
+        subplot(2,2,3);surfme(eval(['D_mean_' stat{fig_i,1}]),wl,solvent,stat{fig_i,1},'Mean Diff');
+        subplot(2,2,4);
+        yyaxis left
+        eval(['e=errorbar(edges(1:end-1),L_mean_' stat{fig_i,1} ',L_std_' stat{fig_i,1} './2);']);
+        xlabel('Wavelength (nm)');ylabel('last time (s)')
+        e.Marker='o';e.LineStyle='none';co=e.Color;e.MarkerEdgeColor=co;e.MarkerFaceColor=co;e.MarkerSize=10;
+        yyaxis right
+        eval(['scatter(edges(1:end-1),num_mean_' stat{fig_i,1} ');']);
+        ylabel('number for average');xlabel('Wavelength (nm)')
+        cd(Folder)
+        saveas(gcf,[solvent ' ' stat{fig_i,1} ' average and last.fig'])
+        saveas(gcf,[solvent ' ' stat{fig_i,1} ' average and last.jpg'])
+        close all
+        
+        %For shift plot
+        figure('Position',[2582,1003,1440,385]);
+        %figure;
+        subplot(1,3,1)        
+        yyaxis left; surfme(eval([stat{fig_i,1} '_shift_diff']),wl,solvent,stat{fig_i,1},'Mean diff');
+        yyaxis right; eval(['s=scatter3(1:loc_leng,' stat{fig_i,1} '_shi_v(loc),ones(1,loc_leng)*2);']);
+        co=s.MarkerEdgeColor;s.MarkerFaceColor=co;
+        
+        subplot(1,3,2)        
+        yyaxis left;
+        surfme(eval([stat{fig_i,1} '_shift_current']),wl,solvent,stat{fig_i,1},'Mean current');
+        yyaxis right; eval(['s=scatter3(1:loc_leng,' stat{fig_i,1} '_shi_v(loc),ones(1,loc_leng)*2);']);
+        co=s.MarkerEdgeColor;s.MarkerFaceColor=co;
+        
+        subplot(1,3,3)        
+        yyaxis left;
+        surfme(eval([stat{fig_i,1} '_shift_next']),wl,solvent,stat{fig_i,1},'Mean next');
+        yyaxis right; eval(['s=scatter3(1:loc_leng,' stat{fig_i,1} '_shi_v(loc),ones(1,loc_leng)*2);']);
+        co=s.MarkerEdgeColor;s.MarkerFaceColor=co;
+        
+        close all
+       cd(Folder)
+       saveas(gcf,[solvent ' ' stat{fig_i,1} ' shift distance.fig'])
+       saveas(gcf,[solvent ' ' stat{fig_i,1} ' shift distance.jpg'])
+    end
+catch
+    disp('Could not plot')
+end
 
 
 
 %%
+
+function [shift_diff,shift_current,shift_next,shi,shi_v]=shift_distance(sdif,scurrent,snext,wl)
+    [~,scurrent_max]=max(smoothdata(scurrent,1,'gaussian',8),[],1);
+    scurrent_max=transpose(wl(scurrent_max,1));
+    [~,snext_max]=max(smoothdata(snext,1,'gaussian',8),[],1);
+    snext_max=transpose(wl(snext_max,1));
+    max_dif=snext_max-scurrent_max;
+    [shi_v,shi]=sort(max_dif);
+    shift_diff=sdif(:,shi);
+    shift_current=scurrent(:,shi);
+    shift_next=snext(:,shi);
+
+end 
 function surfme(data,wl,solvent,stat,current)
 surf(1:length(data(1,:)),wl,normalize(data,1,'range'),'EdgeColor','none');
 view([0 0 1]);colormap(jet);title([solvent ' ' stat ' ' current]);
 ylabel('Wavelength (nm)');
 end
-
 function FE(molecules_CND)
 CND_leng=length(molecules_CND(:,1)); 
 First_end=cell(CND_leng,1);
@@ -126,8 +190,6 @@ for CND_leng_i=1:CND_leng
     %figure;plot(normalize(First_end{CND_leng_i,1}(:,1)));hold on;plot(normalize(First_end{CND_leng_i,1}(:,2)));
 end
 end
-
-
 function spectra1=rmLowInt(spectra,codefolder)
     [spectra_zong,spectra_heng]=size(spectra);
     spectra_stage=zeros(spectra_zong,spectra_heng);
@@ -147,12 +209,9 @@ function spectra1=rmLowInt(spectra,codefolder)
     spectra(end-5:end,spectra_stage_ratio<1.3)=1000+max_int;
     spectra1=spectra;
 end
-
-
-function [spc_diff_prepare,spc_current_prepare,spc_next_prepare]=Spectra_prepare_noOrder(Spectra_Diff,Spectra_current,Spectra_Next,wl)
+function [spc_diff_prepare,spc_current_prepare,spc_next_prepare,spc_max_smooth_sort]=Spectra_prepare_noOrder(Spectra_Diff,Spectra_current,Spectra_Next,wl)
 %change of the spectrum, increase or decrease; plot current and next along
 %with difference of spectrum
-    [Spectra_Diff_zong,Spectra_Diff_heng]=size(Spectra_Diff);
     [~,spectramax_smooth_loc]=max(smoothdata(Spectra_Diff,1,'gaussian',8),[],1);
     spc_max_smooth=transpose(wl(spectramax_smooth_loc,1));
 %Order by the change of the diff of the spectrum   
@@ -161,9 +220,7 @@ function [spc_diff_prepare,spc_current_prepare,spc_next_prepare]=Spectra_prepare
     spc_current_prepare=Spectra_current(:,spc_max_smooth_sort);
     spc_next_prepare=Spectra_Next(:,spc_max_smooth_sort);
 end
-
-
-function [spc_diff_prepare,spc_current_prepare,spc_next_prepare]=Spectra_prepare(Spectra_Diff,Spectra_current,Spectra_Next,wl,edges)
+function [spc_diff_prepare,spc_current_prepare,spc_next_prepare,M_last_prepare]=Spectra_prepare(Spectra_Diff,Spectra_current,Spectra_Next,M_last,wl,edges)
 %change of the spectrum, increase or decrease; plot current and next along
 %with difference of spectrum
     [Spectra_Diff_zong,~]=size(Spectra_Diff);
@@ -174,6 +231,7 @@ function [spc_diff_prepare,spc_current_prepare,spc_next_prepare]=Spectra_prepare
     spc_diff_prepare=cell(spectra_edge_leng,1);
     spc_current_prepare=cell(spectra_edge_leng,1);
     spc_next_prepare=cell(spectra_edge_leng,1);
+    M_last_prepare=cell(spectra_edge_leng,1);
     for spectra_edge_i=1:spectra_edge_leng 
         clearvars spc
         spc=find((spc_max_smooth>=edges(1,spectra_edge_i)) & (spc_max_smooth<edges(1,spectra_edge_i+1)));
@@ -181,10 +239,12 @@ function [spc_diff_prepare,spc_current_prepare,spc_next_prepare]=Spectra_prepare
         spc_diff_prepare{spectra_edge_i,1}=zeros(Spectra_Diff_zong,spc_leng);
         spc_current_prepare{spectra_edge_i,1}=zeros(Spectra_Diff_zong,spc_leng);
         spc_next_prepare{spectra_edge_i,1}=zeros(Spectra_Diff_zong,spc_leng);
+        M_last_prepare{spectra_edge_i,1}=zeros(1,spc_leng);
         for sec_i=1:spc_leng
-            spc_diff_prepare{spectra_edge_i,1}=Spectra_Diff(:,spc(1,sec_i));
-            spc_current_prepare{spectra_edge_i,1}=Spectra_current(:,spc(1,sec_i));
-            spc_next_prepare{spectra_edge_i,1}=Spectra_Next(:,spc(1,sec_i));
+            spc_diff_prepare{spectra_edge_i,1}(:,sec_i)=Spectra_Diff(:,spc(1,sec_i));
+            spc_current_prepare{spectra_edge_i,1}(:,sec_i)=Spectra_current(:,spc(1,sec_i));
+            spc_next_prepare{spectra_edge_i,1}(:,sec_i)=Spectra_Next(:,spc(1,sec_i));
+            M_last_prepare{spectra_edge_i,1}(:,sec_i)=M_last(1,spc(1,sec_i));
         end
     end
 end
