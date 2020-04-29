@@ -1,11 +1,11 @@
 %1. write the spetra goes down and up, arange spectra side by side
 clearvars;
-solvent='MEH_CH_Clear_chromophore';
-molecules_CND=load('E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\change int\MEH_Chloroform_rmBG molecules_CND.mat');
+solvent='F8T2SMS400';
+molecules_CND=load('E:\F8T2400nmCH\F8T2 400nm Change Int\F8T2400nmCH molecules_CND.mat');
 wl=molecules_CND.wl;molecules_CND=molecules_CND.molecules_CND;
 codefolder='C:\Users\Livi\Documents\GitHub\Data-Reform\After Dataset compare Excel';
 edges=450:1:670;
-Folder='E:\MEH substrate clean mat data\MEH_Chloroform_rmBG\change int';
+Folder='E:\F8T2400nmCH\F8T2 400nm Change Int';
 % Plot_inc_dec(molecules_CND,wl,edges,codefolder)
 
 wl_leng=length(wl(:,1));
@@ -97,12 +97,12 @@ try
         clearvars C N D L
         eval(['C=' stat{fig_i,1} '_current_mesh;']);eval(['N=' stat{fig_i,1} '_next_mesh;']);
         eval(['D=' stat{fig_i,1} '_diff_mesh;']); eval(['L=molecules_last_' stat{fig_i,1} ';']);
-        subplot(2,2,1);surfme(C,wl,solvent,stat{fig_i,1},'Current');
-        xticks(1:20:length(C(1,:)));eval(['xticklabels(' stat{fig_i,1} '_xl(1:20:end));']);
-        subplot(2,2,2);surfme(N,wl,solvent,stat{fig_i,1},'Next')
-        xticks(1:20:length(C(1,:)));eval(['xticklabels(' stat{fig_i,1} '_xl(1:20:end));']);
-        subplot(2,2,3);surfme(D,wl,solvent,stat{fig_i,1},'Diff')
-        xticks(1:20:length(C(1,:)));eval(['xticklabels(' stat{fig_i,1} '_xl(1:20:end));']);
+        subplot(2,2,1);surfme(C,1:length(C(1,:)),wl,solvent,stat{fig_i,1},'Current');
+        xticks(1:20:length(C(1,:)));eval(['xticklabels(' stat{fig_i,1} '_xl(1:20:end));']);xlabel('Wavelength (nm)')
+        subplot(2,2,2);surfme(N,1:length(C(1,:)),wl,solvent,stat{fig_i,1},'Next')
+        xticks(1:20:length(C(1,:)));eval(['xticklabels(' stat{fig_i,1} '_xl(1:20:end));']);xlabel('Wavelength (nm)')
+        subplot(2,2,3);surfme(D,1:length(C(1,:)),wl,solvent,stat{fig_i,1},'Diff')
+        xticks(1:20:length(C(1,:)));eval(['xticklabels(' stat{fig_i,1} '_xl(1:20:end));']);xlabel('Wavelength (nm)')
         subplot(2,2,4);scatter(1:length(L),L);ylabel('last time (s)')
         cd(Folder)
         saveas(gcf,[solvent ' ' stat{fig_i,1} ' order by max spectra (all).fig'])
@@ -112,9 +112,9 @@ try
         %plot mean spectra sort by spectra
         figure('Position',[2852,1003,1170,858]);
         %figure;
-        subplot(2,2,1);surfme(eval(['C_mean_' stat{fig_i,1}]),wl,solvent,stat{fig_i,1},'Mean Current');
-        subplot(2,2,2);surfme(eval(['N_mean_' stat{fig_i,1}]),wl,solvent,stat{fig_i,1},'Mean Next');
-        subplot(2,2,3);surfme(eval(['D_mean_' stat{fig_i,1}]),wl,solvent,stat{fig_i,1},'Mean Diff');
+        subplot(2,2,1);surfme(eval(['C_mean_' stat{fig_i,1}]),edges(1,1:end-1),wl,solvent,stat{fig_i,1},'Mean Current');xlabel('Wavelength (nm)');
+        subplot(2,2,2);surfme(eval(['N_mean_' stat{fig_i,1}]),edges(1,1:end-1),wl,solvent,stat{fig_i,1},'Mean Next');xlabel('Wavelength (nm)');
+        subplot(2,2,3);surfme(eval(['D_mean_' stat{fig_i,1}]),edges(1,1:end-1),wl,solvent,stat{fig_i,1},'Mean Diff');xlabel('Wavelength (nm)')
         subplot(2,2,4);
         yyaxis left
         eval(['e=errorbar(edges(1:end-1),L_mean_' stat{fig_i,1} ',L_std_' stat{fig_i,1} './2);']);
@@ -148,10 +148,10 @@ try
         yyaxis right; eval(['s=scatter3(1:loc_leng,' stat{fig_i,1} '_shi_v(loc),ones(1,loc_leng)*2);']);
         co=s.MarkerEdgeColor;s.MarkerFaceColor=co;
         
-        close all
        cd(Folder)
        saveas(gcf,[solvent ' ' stat{fig_i,1} ' shift distance.fig'])
        saveas(gcf,[solvent ' ' stat{fig_i,1} ' shift distance.jpg'])
+       close all
     end
 catch
     disp('Could not plot')
@@ -173,8 +173,8 @@ function [shift_diff,shift_current,shift_next,shi,shi_v]=shift_distance(sdif,scu
     shift_next=snext(:,shi);
 
 end 
-function surfme(data,wl,solvent,stat,current)
-surf(1:length(data(1,:)),wl,normalize(data,1,'range'),'EdgeColor','none');
+function surfme(data,x,wl,solvent,stat,current)
+surf(x,wl,normalize(data,1,'range'),'EdgeColor','none');
 view([0 0 1]);colormap(jet);title([solvent ' ' stat ' ' current]);
 ylabel('Wavelength (nm)');
 end
