@@ -2,7 +2,7 @@
 function [ccdt_wavelength,ccdt]=Genccdwl(A,shift,wavebin)
     x_start=A(1,1);
     x_end=A(wavebin,1);
-%Check on same row or not
+%PART I:Check on same row or not
     for i=[1 2 5 10 50 60]
         figure;
         mesh(A(i*wavebin+1:(i+1)*wavebin,2:end));view([0,0,1])
@@ -16,13 +16,13 @@ function [ccdt_wavelength,ccdt]=Genccdwl(A,shift,wavebin)
     
 % populate the CCDT matrix from the A matrix
 %%%place need a check point to determin the measurement...
-    ccdt=reshape(sum(A(:,jmax:jmax+1),2),wavebin,[]);
-% PART IIC: Dark background subtraction
+    ccdt=reshape(sum(A(:,jmax),2),wavebin,[]);
+% PART III: Dark background subtraction
 % use the first CCD image for background subtraction
     bkgavg=sum(ccdt(1:wavebin,1))/wavebin;
     ccdt = ccdt - bkgavg;    % subtract the average dark pixel from every point
 
-% PART IID: Remove data glitches 
+% PART IV: Remove data glitches 
     [zong,heng]=size(ccdt);
     ccdt_min=[];
     w=A(1:wavebin,1)+shift;
