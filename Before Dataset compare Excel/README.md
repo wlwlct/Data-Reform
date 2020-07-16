@@ -4,7 +4,7 @@ Inside the target folder, it contains:
 - apd folder with *.mat files
 - ccdt folder with *.asc and *.mat files (ccdt_wavelength_*)
 
-All filenames need to contain the fluorescent polymer; the wight of inert matrix material; inert matrix material; data; file label. Inside the file label, it is in the format of '*d*d*'. The three numbers indivisually present:
+All filenames need to contain the fluorescent polymer; the wight of inert matrix material; inert matrix material; data; file label. Inside the file label, it is in the format of '\*d\*d\*'. The three numbers indivisually present:
 - the number of sample tested in the day. 
 - the number of raster scan teste for the current sample
 - the number of molecule measured in the current raster scan
