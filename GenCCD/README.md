@@ -3,7 +3,7 @@ This code is designed to generate the ccd spectra. It is designed to run on PC a
 
 ### Prepare
 - Put 'asc' files into one folder. The name of the file is better named as '\*d\*d\*.asc', where the numbers represent the number of sample, the number of raster scan, and the number of bright spots. 
-- Open a note book to write the Spectrum specification. Record the number of max row (jmax), shift, one row or multiple row, special files for future test. 
+- Open a note book to write the Spectrum specification. Record the number of max row (jmax), shift, one row or multiple row, special files for future test and where average wavelength is calculated.
   
 ### How to use
 - Change <b>srcDir</b> into the direction of folder that contains asc files.
