@@ -33,12 +33,13 @@
 % end
 %%
 clearvars
-ba=importdata('E:\F8T2N2\apd full\A\F8T2 Chloroform 2kDa N2 02212019 SecDtime 1d2d6.mat');
-B=sum(cell2mat(ba(:,2)),1);figure('Position',[-1673 218 560 420]);
-date='02222019';
+cd('E:\F8Se2\F8Se2_CH\apd full')
+ba=importdata('F8Se2_CH 01212019 SecDtime 2d1d3.mat');
+B=sum(cell2mat(ba(:,2)),1);figure('Position',[2562,393,560,420]);
+date='01212019';
 %files={'4d1d10';'4d1d11';'4d1d12';'4d1d13';'4d1d15';'4d1d2';'4d1d4';'4d1d5';'4d1d9'};
 
-move=5;
+move=0;
 
 
 names=struct2cell(dir(['*' date '*']));
@@ -62,7 +63,7 @@ for files_i=1:files_leng
     for i=1:SecDtime_leng
         Current_Sec=SecDtime{i,1};
         SecDtime_max=max(Current_Sec);
-        SecDtime_ts{i,1}=[Current_Sec(Current_Sec<SecDtime_max-move)+move;Current_Sec(Current_Sec>=SecDtime_max-move)+1-SecDtime_max-move ];
+        SecDtime_ts{i,1}=[Current_Sec(Current_Sec<=(SecDtime_max-move))+move;Current_Sec(Current_Sec>(SecDtime_max-move))+1-SecDtime_max+move ];
         SecDtime_ts{i,2}=histcounts(SecDtime_ts{i,1},1:6252);
         SecDtime_ts{i,3}=length(SecDtime_ts{i,1}(:,1));
     end
