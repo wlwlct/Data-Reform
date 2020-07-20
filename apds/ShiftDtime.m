@@ -62,8 +62,7 @@ for files_i=1:files_leng
 
     for i=1:SecDtime_leng
         Current_Sec=SecDtime{i,1};
-        SecDtime_max=max(Current_Sec);
-        SecDtime_ts{i,1}=[Current_Sec(Current_Sec<=(SecDtime_max-move))+move;Current_Sec(Current_Sec>(SecDtime_max-move))+1-SecDtime_max+move ];
+        SecDtime_ts{i,1}=[Current_Sec(Current_Sec<=(6251-move))+move;Current_Sec(Current_Sec>(6251-move))-6251+move ];
         SecDtime_ts{i,2}=histcounts(SecDtime_ts{i,1},1:6252);
         SecDtime_ts{i,3}=length(SecDtime_ts{i,1}(:,1));
     end
