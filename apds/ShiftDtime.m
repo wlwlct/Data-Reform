@@ -38,7 +38,7 @@ ba=importdata('F8Se2 01212019 SecDtime 2d1d3.mat');
 B=sum(cell2mat(ba(:,2)),1);figure('Position',[2562,393,560,420]);
 date='02072019';
 %files={'4d1d10';'4d1d11';'4d1d12';'4d1d13';'4d1d15';'4d1d2';'4d1d4';'4d1d5';'4d1d9'};
-
+BG_range=50:100;
 move=40;
 
 
@@ -53,7 +53,7 @@ files_leng=length(files(:,1));
 
 
 for files_i=1:files_leng
-    clearvars -except files_i files_leng date files move B ba 
+    clearvars -except files_i files_leng date files move B ba BG_range
     plot(normalize(B,'range'),'DisplayName','Should be');
     name=dir(['*' date '*' files{files_i,1} '.mat']);
     SecDtime=importdata(name.name);
@@ -70,7 +70,7 @@ for files_i=1:files_leng
     Sec=sum(cell2mat(SecDtime(:,2)),1);
     Sec_ts=sum(cell2mat(SecDtime_ts(:,2)),1);
     Sec_smooth_max=max(smoothdata(Sec,'gaussian',8));
-    BG_range=50:100;
+
     
     hold on;plot((Sec-mean(Sec(1,BG_range)))/(Sec_smooth_max-mean(Sec(1,BG_range))),'DisplayName','original')
     
