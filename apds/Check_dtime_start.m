@@ -1,11 +1,11 @@
 %use to test whether the dtime start at same place
 clearvars
-cd('E:\F8T2N2\apd full')
-allnames=struct2cell(dir('F8T2*'));
+cd('E:\F8Se2\F8Se2_CH\apd full')
+allnames=struct2cell(dir('F8Se2*'));
 [~,len]=size(allnames);
 
 %days=['02142019';'02152019';'02172019';'02182019';'02212019';'02222019';'02262019'];
-days=['02042019'];
+days=['01212019'; '02062019'; '02072019'];
 days_leng=length(days(:,1));
 
 for days_i=1:days_leng

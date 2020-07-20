@@ -5,9 +5,9 @@
 %1:6252, third column is intensity.
 clearvars
 codefolder=pwd;
-solvent='MEH_CH';
-srdir=['/scratch/lwang74/PTU_spectrum_lifetime_bluehive/PTUdata/' solvent];
-%srdir=['E:\F8T2N2'];
+solvent='F8Se2';
+%srdir=['/scratch/lwang74/PTU_spectrum_lifetime_bluehive/PTUdata/' solvent];
+srdir=['E:\F8Se2\F8Se2_CH\'];
 cd (srdir)
 year='2019';
 allnames=struct2cell(dir( ['*' year '*.mat']));

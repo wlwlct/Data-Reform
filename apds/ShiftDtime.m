@@ -34,12 +34,12 @@
 %%
 clearvars
 cd('E:\F8Se2\F8Se2_CH\apd full')
-ba=importdata('F8Se2_CH 01212019 SecDtime 2d1d3.mat');
+ba=importdata('F8Se2 01212019 SecDtime 2d1d3.mat');
 B=sum(cell2mat(ba(:,2)),1);figure('Position',[2562,393,560,420]);
-date='01212019';
+date='02072019';
 %files={'4d1d10';'4d1d11';'4d1d12';'4d1d13';'4d1d15';'4d1d2';'4d1d4';'4d1d5';'4d1d9'};
 
-move=0;
+move=40;
 
 
 names=struct2cell(dir(['*' date '*']));
@@ -69,13 +69,17 @@ for files_i=1:files_leng
 
     Sec=sum(cell2mat(SecDtime(:,2)),1);
     Sec_ts=sum(cell2mat(SecDtime_ts(:,2)),1);
-
-    hold on;plot(normalize(Sec,'range'),'DisplayName','original')
-    hold on;plot(normalize(Sec_ts,'range'),'DisplayName',['move' num2str(move)]);
-    xlim([10 500]);legend;hold off
+    Sec_smooth_max=max(smoothdata(Sec,'gaussian',8));
+    BG_range=50:100;
+    
+    hold on;plot((Sec-mean(Sec(1,BG_range)))/(Sec_smooth_max-mean(Sec(1,BG_range))),'DisplayName','original')
+    
+    Sec_ts_smooth_max=max(smoothdata(Sec,'gaussian',8));
+    hold on;plot((Sec_ts-mean(Sec_ts(1,BG_range)))/(Sec_ts_smooth_max-mean(Sec_ts(1,BG_range))),'DisplayName',['move' num2str(move)])
+    ylim([0 1.1]);xlim([10 500]);legend;title(name.name(1:end-4));hold off
 
     
-    clearvars -except SecDtime_ts name files_i files_leng date files move B ba 
+    clearvars -except SecDtime_ts name files_i files_leng date files move B ba Sec_smooth_max Sec_ts_smooth_max
     SecDtime=SecDtime_ts;
     save([name.name(1:end-4) '_test.mat'],'SecDtime')
 end
