@@ -33,13 +33,13 @@
 % end
 %%
 clearvars
-cd('E:\F8Se2\F8Se2_CH\apd full')
-ba=importdata('F8Se2 01212019 SecDtime 2d1d3.mat');
-B=sum(cell2mat(ba(:,2)),1);figure('Position',[2562,393,560,420]);
-date='02072019';
+cd('E:\F8T2400nmCH\apd full')
+ba=importdata('F8T2SMS400 02022020 SecDtime 1d2d5.mat');
+B=sum(cell2mat(ba(:,2)),1);figure('Position',[2866,1053,560,420]);
+date='02052020';
 %files={'4d1d10';'4d1d11';'4d1d12';'4d1d13';'4d1d15';'4d1d2';'4d1d4';'4d1d5';'4d1d9'};
 BG_range=50:100;
-move=40;
+move=-10;
 
 
 names=struct2cell(dir(['*' date '*']));
@@ -79,7 +79,7 @@ for files_i=1:files_leng
     ylim([0 1.1]);xlim([10 500]);legend;title(name.name(1:end-4));hold off
 
     
-    clearvars -except SecDtime_ts name files_i files_leng date files move B ba Sec_smooth_max Sec_ts_smooth_max
+    clearvars -except SecDtime_ts name files_i files_leng date files move B ba Sec_smooth_max Sec_ts_smooth_max BG_range
     SecDtime=SecDtime_ts;
     save([name.name(1:end-4) '_test.mat'],'SecDtime')
 end
