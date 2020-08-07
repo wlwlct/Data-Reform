@@ -4,7 +4,7 @@ fprintf(1,'\n');
 codefolder=pwd;
 shift=0;%blue or redshift results
 wavebin=100;
-srcDir='E:\02062019 F8T2\ccd';
+srcDir='E:\F8Se2 July\08062020\ccd';
 cd(srcDir);
 allnames=struct2cell(dir('*.asc')); 
 [k,len]=size(allnames); 

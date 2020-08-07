@@ -28,13 +28,13 @@ function [ccdt_wavelength,ccdt]=Genccdwl(A,shift,wavebin)
     w=A(1:wavebin,1)+shift;
     ccdt_min=min(min(ccdt));
     ccdt=ccdt-ccdt_min;%a constant baseline is also removed
-    mesh(ccdt);   
+    mesh(ccdt);view([1,1,1])
 %%%check point
 %If spike show up, stop here and give (y,x); the value should be valuable
 %if the number is average between 2 numbers.((y-1)+(y+1))/2
     ccdt_wavelength=zeros(heng-1,1);
     for i=2:heng
-        ccdt_wavelength(i,1)=sum(ccdt(1:zong,i).*w(1:end))/sum(ccdt(1:zong,i));
+        ccdt_wavelength(i,1)=sum(ccdt(22:zong,i).*w(22:end))/sum(ccdt(22:zong,i));
     end
 ccdt=cat(2,w,ccdt);
 
