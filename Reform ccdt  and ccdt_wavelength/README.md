@@ -11,5 +11,8 @@
 - Record the file name that you want to use as the background.
 - load the ccdt file and generate the ave_ccdxdxdx which contains wavelength and average intensity (two columns)
 - Use <b>Reform_ccdt</b> to remove background
-  - Pay attention to <b>filefolder</b>, <b>regp</b>,<b>place</b>,<b>clearvars</b>
-- Then move to reform apd, and use to before put excel to see select molecules that going to be run.
+  - Set <b>filefolder</b> to the folder that contains files
+  - <b>regp</b> set to 'xdxd' to make sure remove backgroud from correct files
+  - <b>place</b> set to the bin number where you would like to start the calculation, somewhere between excitation wavelength and useful fluorescence signal.
+  - Pay attention to <b>clearvars</b>
+- Then move to <b>reform apd<\b>, and use to before put excel to see select molecules that going to be run.
