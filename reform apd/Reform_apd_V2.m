@@ -1,8 +1,8 @@
 %%
 clearvars
-filefolder='E:\02052020 rerun\selected ave_ccd1d3d12';
+filefolder='E:\F8Se2 July\08062020\apd rBG';
 cd(filefolder)
-names=struct2cell(dir('1d3d*'));
+names=struct2cell(dir('3d4d*.mat'));
 n=names(1,:);
 for i=1:length(n);old=n{1,i};new=strrep(old,'.mat','');
     new=genvarname(strrep(new,' ',''));
@@ -10,14 +10,14 @@ for i=1:length(n);old=n{1,i};new=strrep(old,'.mat','');
 end
 clearvars -except x* matrix* filefolder
 v=who('x*');
-BG=importdata([filefolder '\1d3d12.mat']);
+BG=importdata([filefolder '\3d4d10.mat']);
 %%
 %APD test the absolute time cut and dtime cut.
 % for i=1:length(v);eval(['n(i,1)=max(' v{i,1} '.PTU3file.data(:,5));']);end
 % absolutetime_min=min(n);
 for i=1:length(v);eval(['n(i,1)=max(' v{i,1} '.PTU3file.data(:,6));']);end
 bin_min=min(n);
-bin_min=6250;
+bin_min=6169;
 for i=1:length(v);eval(['n1=' v{i,1} '.PTU3file.data(:,1);']);n2=n1(2:end,1);n1=n1(1:end-1,1);u{i,1}=unique(n1-n2);end
 
 %%
