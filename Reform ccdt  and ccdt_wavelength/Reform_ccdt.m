@@ -1,7 +1,8 @@
 clearvars
 code_folder=pwd;
-file_folder='E:\02052020\CCD\1d3d';
-regp='1d3d';
+file_folder='E:\F8Se2 July\07242020\ccd notRB\1d4d selecr 1d4d6';
+regp='1d4d';
+place=22;
 % Generate the background part
 cd(file_folder)
 names=struct2cell(dir('ave_ccd*.mat'));
@@ -14,14 +15,14 @@ end
 %import all the ccdt need to substract background
 clearvars names
 cd(file_folder)
-names=struct2cell(dir('ccdt*.mat'));
+names=struct2cell(dir('*ccdt*.mat'));
 n=names(1,:);
 for i=1:length(n);old=n{1,i};new=strrep(old,'.mat','');
     new=genvarname(strrep(new,' ',''));
     eval([new '=importdata(' char(39) names{1,i} char(39) ');']);
 end
-clearvars -except ccdt* ave* regp
-v=who('ccdt*');
+clearvars -except *ccdt* ave* regp place
+v=who('*ccdt*');
 b=who('ave*');
 
 %substract each background
@@ -34,7 +35,7 @@ for ii=1:length(b)
         eval(['ccdt=[ccdt(:,1:2) ccdt(:,3:end)-' b{ii,1} '(:,2)];']);
    %Calculate ccdt_wavelength
         ccdt(:,3:end)=ccdt(:,3:end)+abs(min(ccdt(:,3:end),[],1));
-        eval(['ccdt_wavelength=sum(ccdt(:,1).*ccdt(:,3:end),1)./sum(ccdt(:,3:end),1);']) 
+        eval(['ccdt_wavelength=sum(ccdt(' num2str(place) ':end,1).*ccdt(' num2str(place) ':end,3:end),1)./sum(ccdt(' num2str(place) ':end,3:end),1);']) 
         ccdt_wavelength=[0; ccdt_wavelength'];
         try
             eval(['save(' char(39) loc 'ccdt' na '.mat' char(39) ',' char(39) 'ccdt' char(39) ');'])
@@ -48,8 +49,5 @@ for ii=1:length(b)
     
     
 end
-clearvars
 
-% 
-% cd('C:\Users\Livi\Documents\Results\Matlab code\Under development\General pic to excel');
-% Pic2Excel_general(matrix1,matrix2)
+
