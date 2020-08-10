@@ -15,4 +15,4 @@
   - <b>regp</b> set to 'xdxd' to make sure remove backgroud from correct files
   - <b>place</b> set to the bin number where you would like to start the calculation, somewhere between excitation wavelength and useful fluorescence signal.
   - Pay attention to <b>clearvars</b>
-- Then move to <b>reform apd<\b>, and use to before put excel to see select molecules that going to be run.
+- Then move to <b>reform apd</b>, and use to before put excel to see select molecules that going to be run.
