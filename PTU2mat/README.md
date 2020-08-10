@@ -1,5 +1,5 @@
 ### Purpose
-Transfer data from '*.ptu' file to '*.mat' file. 
+Transfer data from '\*.ptu' file to '\*.mat' file. 
 
 ### Prepare
 - <b>'*.ptu'</b> files in a folder. 
