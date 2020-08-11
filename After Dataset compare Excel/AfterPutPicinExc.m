@@ -4,11 +4,12 @@
 clearvars; close all;
 codefolder=pwd;
 %For my file need to change Generalname etc.;
-folderlocation='E:\';
+folderlocation='E:\F8Se2 July\';
 cd(folderlocation);
-properfolder=dir('*F8T2O2');
+properfolder=dir('*F8Se2O2');
 properfolder_leng=length(properfolder);
 place=22;
+
 for properfolder_i=1:1:properfolder_leng
     pathname=[properfolder(properfolder_i).folder '\' properfolder(properfolder_i).name];
     %Open excel and try to put into proper place
@@ -42,7 +43,6 @@ for properfolder_i=1:1:properfolder_leng
         regularexp='\d*d\d*d\d*.mat';
         T=regexp(filename,regularexp);
         Generalname=filename(T:end-4);
-
         %try and catch to load eberything that is possible
         try
             datasetfile=importdata([pathname '\' filename]);
@@ -65,163 +65,123 @@ for properfolder_i=1:1:properfolder_leng
             disp('No intensity found')
         end
 %save the plot
-n=n+1;
-print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-% print(gcf,'-clipboard', '-dbitmap');
- pause (0.5);
-Ex.ActiveSheet.Range(['C' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['C' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['C' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
-%%
+    n=n+1;exel_p(dpi,'C',n,files_i,Ex)
+
+    %%
 %plot CCD spectrum with average wavelength
-figure;
-surf(1:99,datasetfile.ccdt(place:end,1),normalize(datasetfile.ccdt(place:end,3:end),1,'range'),'EdgeColor','none');
-view([0 0 1]);colormap(jet);
-hold on; scatter3(1:99,datasetfile.scatterplot.spectrum,1.5*ones(1,99),'r','filled')
-xlabel('Exp Time (s)')
-ylabel('Wavelength (nm)');
-n=n+1;
-%save the plot
-print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-% print(gcf,'-clipboard', '-dbitmap');
- pause (0.5);
- Ex.ActiveSheet.Range(['D' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['D' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['D' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
+    figure;
+    surf(1:length(datasetfile.ccdt(1,3:end)),datasetfile.ccdt(place:end,1),normalize(datasetfile.ccdt(place:end,3:end),1,'range'),'EdgeColor','none');
+    view([0 0 1]);colormap(jet);
+    hold on; scatter3(1:length(datasetfile.ccdt(1,3:end)),datasetfile.scatterplot.spectrum,1.5*ones(1,length(datasetfile.ccdt(1,3:end))),'r','filled')
+    xlabel('Exp Time (s)');ylabel('Wavelength (nm)');
+    n=n+1;exel_p(dpi,'D',n,files_i,Ex);
 
-%%
+    %%
 %Plot proper ccd mesh with lifetime and intensity
-figure
-datanum=3;%mesh;ccd intensity/sudchange,lifetiem
-colorY=['k','r','m','g','y'];
-%mesh first
-surf(1:99,datasetfile.ccdt(place:end,1),normalize(datasetfile.ccdt(place:end,3:end),1,'range'),'EdgeColor','none');
-view([0 0 1]);colormap(jet);xlabel('Exp Time (s)');ylabel('Wavelength (nm)');
+    figure
+    datanum=3;%mesh;ccd intensity/sudchange,lifetiem
+    colorY=['k','r','m','g','y'];
+    %mesh first
+    surf(1:length(datasetfile.ccdt(1,3:end)),datasetfile.ccdt(place:end,1),normalize(datasetfile.ccdt(place:end,3:end),1,'range'),'EdgeColor','none');
+    view([0 0 1]);colormap(jet);xlabel('Exp Time (s)');ylabel('Wavelength (nm)');
 
-ax(1) = get(gcf,'Children');
-pos = get(ax(1),'position');
-cfig = get(gcf,'color');
+    ax(1) = get(gcf,'Children');
+    pos = get(ax(1),'position');
+    cfig = get(gcf,'color');
 
-offset=0.07;
-startX=offset*datanum;
-pos = [startX 0.1 0.95-startX 0.8];
-set(ax(1),'position',pos);
-limx1 = get(ax(1),'xlim');
+    offset=0.07;
+    startX=offset*datanum;
+    pos = [startX 0.1 0.95-startX 0.8];
+    set(ax(1),'position',pos);
+    limx1 = get(ax(1),'xlim');
 %
-i=2;poss=[pos(1)-offset*(i-1) pos(2) pos(3)+offset*(i-1) pos(4)];
+    i=2;poss=[pos(1)-offset*(i-1) pos(2) pos(3)+offset*(i-1) pos(4)];
     scale = poss(3)/pos(3);
     limxs = [limx1(2)-scale*(limx1(2)-limx1(1)) limx1(2)];
     ax(i)=axes('Position',poss,'box','off',...
         'Color','none','XColor',cfig,'YColor',colorY(i),...
         'xtick',[],'xlim',limxs,'yaxislocation','left');
-    
- line(1:1:99,datasetfile.scatterplot.intensity(2,:),'Color',colorY(i),'Parent',ax(i),'LineWidth',3);
-ylabel('Intensity')
+    line(1:1:length(datasetfile.ccdt(1,3:end)),datasetfile.scatterplot.intensity(2,:),'Color',colorY(i),'Parent',ax(i),'LineWidth',3);
+    ylabel('Intensity')
 
-i=3;poss=[pos(1)-offset*(i-1) pos(2) pos(3)+offset*(i-1) pos(4)];
-scale = poss(3)/pos(3);
-limxs = [limx1(2)-scale*(limx1(2)-limx1(1)) limx1(2)];
-ax(i)=axes('Position',poss,'box','off',...
-'Color','none','XColor',cfig,'YColor',colorY(i),...
+    i=3;poss=[pos(1)-offset*(i-1) pos(2) pos(3)+offset*(i-1) pos(4)];
+    scale = poss(3)/pos(3);
+    limxs = [limx1(2)-scale*(limx1(2)-limx1(1)) limx1(2)];
+    ax(i)=axes('Position',poss,'box','off',...
+    'Color','none','XColor',cfig,'YColor',colorY(i),...
         'xtick',[],'xlim',limxs,'YLim',[50 2500],'yaxislocation','left');
-line(1:1:99,datasetfile.scatterplot.lifetime(:,2),'Color',colorY(i),'Parent',ax(i),'LineWidth',3);
-ylabel('Lifetime')
-yticks([50:400:2500]);
+    line(1:1:length(datasetfile.ccdt(1,3:end)),datasetfile.scatterplot.lifetime(:,2),'Color',colorY(i),'Parent',ax(i),'LineWidth',3);
+    ylabel('Lifetime');yticks([50:400:2500]);
 
-n=n+1;
-print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-% print(gcf,'-clipboard', '-dbitmap');
- pause (0.5);
-Ex.ActiveSheet.Range(['E' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['E' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['E' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
+    n=n+1;
+    exel_p(dpi,'E',n,files_i,Ex)
 
-%%
+    %%
 %Plot proper new ccd mesh with lifetime and intensity
-figure
-datanum=3;%mesh;ccd intensity/sudchange,lifetiem
-colorY=['k','r','m','g','y'];
+    figure
+    datanum=3;%mesh;ccd intensity/sudchange,lifetiem
+    colorY=['k','r','m','g','y'];
 %mesh first
-surf(1:99,datasetfile.newccdt(place:end,1),normalize(datasetfile.newccdt(place:end,3:end),1,'range'),'EdgeColor','none');
-view([0 0 1]);colormap(jet);xlabel('Exp Time (s)');ylabel('Wavelength (nm)');
+    surf(1:length(datasetfile.ccdt(1,3:end)),datasetfile.newccdt(place:end,1),normalize(datasetfile.newccdt(place:end,3:end),1,'range'),'EdgeColor','none');
+    view([0 0 1]);colormap(jet);xlabel('Exp Time (s)');ylabel('Wavelength (nm)');
 
-ax(1) = get(gcf,'Children');
-pos = get(ax(1),'position');
-cfig = get(gcf,'color');
+    ax(1) = get(gcf,'Children');
+    pos = get(ax(1),'position');
+    cfig = get(gcf,'color');
 
-offset=0.07;
-startX=offset*datanum;
-pos = [startX 0.1 0.95-startX 0.8];
-set(ax(1),'position',pos);
-limx1 = get(ax(1),'xlim');
+    offset=0.07;
+    startX=offset*datanum;
+    pos = [startX 0.1 0.95-startX 0.8];
+    set(ax(1),'position',pos);
+    limx1 = get(ax(1),'xlim');
 %
-i=2;poss=[pos(1)-offset*(i-1) pos(2) pos(3)+offset*(i-1) pos(4)];
+    i=2;poss=[pos(1)-offset*(i-1) pos(2) pos(3)+offset*(i-1) pos(4)];
     scale = poss(3)/pos(3);
     limxs = [limx1(2)-scale*(limx1(2)-limx1(1)) limx1(2)];
     ax(i)=axes('Position',poss,'box','off',...
         'Color','none','XColor',cfig,'YColor',colorY(i),...
         'xtick',[],'xlim',limxs,'yaxislocation','left');
     
- line(1:1:99,datasetfile.scatterplot.intensity(2,:),'Color',colorY(i),'Parent',ax(i),'LineWidth',3);
-ylabel('Intensity')
+    line(1:1:length(datasetfile.ccdt(1,3:end)),datasetfile.scatterplot.intensity(2,:),'Color',colorY(i),'Parent',ax(i),'LineWidth',3);
+    ylabel('Intensity')
 
-i=3;poss=[pos(1)-offset*(i-1) pos(2) pos(3)+offset*(i-1) pos(4)];
-scale = poss(3)/pos(3);
-limxs = [limx1(2)-scale*(limx1(2)-limx1(1)) limx1(2)];
-ax(i)=axes('Position',poss,'box','off',...
-'Color','none','XColor',cfig,'YColor',colorY(i),...
+    i=3;poss=[pos(1)-offset*(i-1) pos(2) pos(3)+offset*(i-1) pos(4)];
+    scale = poss(3)/pos(3);
+    limxs = [limx1(2)-scale*(limx1(2)-limx1(1)) limx1(2)];
+    ax(i)=axes('Position',poss,'box','off',...
+    'Color','none','XColor',cfig,'YColor',colorY(i),...
         'xtick',[],'xlim',limxs,'YLim',[50 2500],'yaxislocation','left');
-line(1:1:99,datasetfile.scatterplot.lifetime(:,2),'Color',colorY(i),'Parent',ax(i),'LineWidth',3);
-ylabel('Lifetime')
-yticks([50:400:2500]);
+    line(1:1:length(datasetfile.ccdt(1,3:end)),datasetfile.scatterplot.lifetime(:,2),'Color',colorY(i),'Parent',ax(i),'LineWidth',3);
+    ylabel('Lifetime')
+    yticks([50:400:2500]);
 
-n=n+1;
-print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-% print(gcf,'-clipboard', '-dbitmap');
- pause (0.5);
-Ex.ActiveSheet.Range(['F' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['F' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['F' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
-
+    n=n+1;exel_p(dpi,'F',n,files_i,Ex)
 
 %%
 %plot ccd add up
-figure
-yyaxis left; plot(datasetfile.ccdt(place:end,1),normalize(sum(datasetfile.ccdt(place:end,3:12),2),1,'range'),'LineWidth',3);
-yyaxis right; plot(datasetfile.ccdt(place:end,1),normalize(sum(datasetfile.ccdt(place:end,end-9:end),2),1,'range'),'LineWidth',3);
-legend('First 10 secs','Last 10 secs')
-xlabel('Wavelength (nm)')
-ylabel('Normalized Intensity')
-n=n+1;
-print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
-      '-clipboard', '-dbitmap');
-  % print(gcf,'-clipboard', '-dbitmap');
- pause (0.5);
-Ex.ActiveSheet.Range(['G' num2str(files_i)]).PasteSpecial();
-Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
-Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range(['G' num2str(files_i)]).Width;    %Adjusting width
-Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range(['G' num2str(files_i)]).Height;  %Adjusting height
-Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
-close(gcf);
-end
+    figure
+    yyaxis left; plot(datasetfile.ccdt(place:end,1),normalize(sum(datasetfile.ccdt(place:end,3:12),2),1,'range'),'LineWidth',3);
+    yyaxis right; plot(datasetfile.ccdt(place:end,1),normalize(sum(datasetfile.ccdt(place:end,end-9:end),2),1,'range'),'LineWidth',3);
+    legend('First 10 secs','Last 10 secs')
+    xlabel('Wavelength (nm)')
+    ylabel('Normalized Intensity')
+    n=n+1;exel_p(dpi,'G',n,files_i,Ex)
+    end
 %%
 SaveAs(Exwokbook,[pathname '\' foldername '.xlsx']);
 Close(Exwokbook)
 Quit(Ex)
+end
+
+function exel_p(dpi,letter,n,files_i,Ex)
+    print(gcf, sprintf('-r%d', dpi), ...      % Print the figure at the screen resolution
+      '-clipboard', '-dbitmap');
+    % print(gcf,'-clipboard', '-dbitmap');
+    pause (0.5);
+    Ex.ActiveSheet.Range([letter num2str(files_i)]).PasteSpecial();
+    Ex.ActiveSheet.Shapes.Item(n).LockAspectRatio='msoFalse';            %Unlocking aspect ratio
+    Ex.ActiveSheet.Shapes.Item(n).Width=Ex.ActiveSheet.Range([letter num2str(files_i)]).Width;    %Adjusting width
+    Ex.ActiveSheet.Shapes.Item(n).Height=Ex.ActiveSheet.Range([letter num2str(files_i)]).Height;  %Adjusting height
+    Ex.ActiveSheet.Shapes.Item(n).Placement='xlMoveandSize';
+    close(gcf);
 end
