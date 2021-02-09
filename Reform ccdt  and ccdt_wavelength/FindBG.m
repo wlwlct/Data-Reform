@@ -48,6 +48,7 @@ for file1=2:3
                 
             end
             matrix_0=matrix;
+            namematrix=reshape([names(1,:);names(1,:)],1,[]);
             for names_i=1:names_leng
                 eval(['matrix_' num2str(names_i) '(:,2:2:names_leng*2)=matrix(:,2:2:names_leng*2)-matrix(:,names_i*2);'])
                 %matrix_1 means wavelength remove first molecule as BG
@@ -55,11 +56,11 @@ for file1=2:3
             end
 
             n=who('matrix_*');str='';
-            n=[{'apdmatrix'};n];
+            n=[{'namematrix'};{'apdmatrix'};n];
             %n{end+1}='apdmatrix';
-            for i=1:names_leng+1+1
+            for i=1:names_leng+1+1+1 %count matrix+namematrix+apdmatrix
                 str=strcat(str,n{i,1});
-                if i~=names_leng+2;str=strcat(str,',');end
+                if i~=names_leng+3;str=strcat(str,',');end%count matrix+namematrix+apdmatrix
             end
             cd('C:\Users\Livi\Documents\GitHub\Some-codes')
             eval(['Pic2Excel_general(' str ');'])
