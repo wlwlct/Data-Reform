@@ -1,7 +1,21 @@
+%Generate ave file
+folder='E:\F8Se2 July\08172020\ccd nrBG\3d1d select 3d1d13'
+file='3d1d13';
+cd(folder)
+wpname=genvarname(['ave_ccd' file]);
+
+loc=struct2cell(dir(['*' file '*.mat']));
+ccdt=importdata([loc{2,1} '\' loc{1,1}]);
+
+sp=[ccdt(:,1),mean(ccdt(:,3:end),2)];
+eval([wpname '=sp;'])
+save(['ave_ccd' file '.mat'],wpname)
+%%
+%get ccdt
 clearvars
-code_folder=pwd;
-file_folder='E:\F8Se2 July\07242020\ccd notRB\1d4d selecr 1d4d6';
-regp='1d4d';
+code_folder='C:\Users\Livi\Documents\GitHub\Data-Reform\Reform ccdt  and ccdt_wavelength';
+file_folder='E:\F8Se2 July\08172020\ccd nrBG\3d1d select 3d1d13';
+regp='3d1d';
 place=22;
 % Generate the background part
 cd(file_folder)
@@ -46,7 +60,6 @@ for ii=1:length(b)
             eval(['save(' char(39) loc 'ccdt_wavelength' na '.mat' char(39) ',' char(39) 'ccdt_wavelength' char(39) ');'])
         end
     end
-    
     
 end
 

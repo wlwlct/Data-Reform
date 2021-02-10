@@ -7,7 +7,7 @@ clearvars
 ccdfolder='E:\F8Se2 July\08172020\ccd rBG';
 apdfolder='E:\F8Se2 July\08172020\apd';
 apd_range=200:1000;
-for file1=2:3
+for file1=3:3
     for file2=1:3
         try
             fold=[num2str(file1) 'd' num2str(file2) 'd'];
