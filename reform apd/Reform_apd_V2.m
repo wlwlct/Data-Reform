@@ -1,17 +1,22 @@
+%Bsed on the exponential decay, remove the background by randomly select
+%detected photon with specific dtime.
 %%
-clearvars
-filefolder='E:\F8Se2 July\08062020\apd rBG';
+fn={'2d3d','3d1d'};
+rn={'2d3d10','3d1d13'};
+for fi = 1:length(fn)
+clearvars -except fn rn fi
+filefolder=['E:\F8Se2 July\08172020\apd rBG\',fn{1,fi}];
 cd(filefolder)
-names=struct2cell(dir('3d4d*.mat'));
+names=struct2cell(dir([fn{1,fi},'*.mat']));
 n=names(1,:);
 for i=1:length(n);old=n{1,i};new=strrep(old,'.mat','');
     new=genvarname(strrep(new,' ',''));
     eval([new '=importdata(' char(39) names{1,i} char(39) ');']);
 end
-clearvars -except x* matrix* filefolder
+clearvars -except x* matrix* filefolder rn fn fi
 v=who('x*');
-BG=importdata([filefolder '\3d4d10.mat']);
-%%
+BG=importdata([filefolder '\' rn{1,fi} '.mat']);
+%
 %APD test the absolute time cut and dtime cut.
 % for i=1:length(v);eval(['n(i,1)=max(' v{i,1} '.PTU3file.data(:,5));']);end
 % absolutetime_min=min(n);
@@ -20,7 +25,7 @@ bin_min=min(n);
 bin_min=6169;
 for i=1:length(v);eval(['n1=' v{i,1} '.PTU3file.data(:,1);']);n2=n1(2:end,1);n1=n1(1:end-1,1);u{i,1}=unique(n1-n2);end
 
-%%
+%
 %For apd file, cut the long absolute time, change the one with long bin to
 %some other number, random remove some counts based 3d3d15.
 
@@ -28,7 +33,7 @@ for i=1:length(v);eval(['n1=' v{i,1} '.PTU3file.data(:,1);']);n2=n1(2:end,1);n1=
 m=bin_min;
 for i=1:length(v)
     %clearvars PTU3file Resolution currentdata currentresolution 
-    clearvars -except x* matrix* v BG bin_min m test i
+    clearvars -except x* matrix* v BG bin_min m test i fn rn fi
       
 currentdata=eval([v{i,1} '.PTU3file.data;']);
 currentresolution=eval([v{i,1} '.Resolution;']);
@@ -69,6 +74,23 @@ PTU3file.data=[currentdata(1:current_col_s-1,:);current_refine;currentdata(curre
 Resolution=currentresolution;
 eval(['save(' char(39) v{i,1} '.mat' char(39) ',' char(39) 'PTU3file' char(39) ',' char(39) 'Resolution' char(39) ');']);
     
+end
+end
+%%
+clearvars -except fn
+cd ..
+desire_folder=pwd;
+folders=struct2cell(dir('*d'));
+for i =1:length(folders(1,:))
+    for ii=1:length(fn)
+        if strcmp(folders{1,i},fn{1,ii})
+            cd([desire_folder '\' folders{1,i}])
+            files=struct2cell(dir('x*.mat'));
+            for file=1:length(files(1,:))
+                movefile(files{1,file},desire_folder)
+            end
+        end
+    end
 end
 
 
