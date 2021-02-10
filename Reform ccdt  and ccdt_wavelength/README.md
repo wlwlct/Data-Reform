@@ -9,8 +9,9 @@
   - Rest columns wll be the average spectra of various molecules subtract same background.
   - The code does not provide auto save, you need to save the exel by yourself.
 - Record the file name that you want to use as the background.
-- load the ccdt file and generate the ave_ccdxdxdx which contains wavelength and average intensity (two columns)
 - Use <b>Reform_ccdt</b> to remove background
+  - Use genave section to generate file for remove background
+    - load the ccdt file and generate the ave_ccdxdxdx which contains wavelength and average intensity (two columns)
   - Set <b>filefolder</b> to the folder that contains files
   - <b>regp</b> set to 'xdxd' to make sure remove backgroud from correct files
   - <b>place</b> set to the bin number where you would like to start the calculation, somewhere between excitation wavelength and useful fluorescence signal.
