@@ -3,6 +3,7 @@ Deal with apd files to use the shape only. Generate <b>SecDtime file</b>, for ea
 
 ### How to run: <br>
 - run <b>apds</b> first, and generate SecDtime files 
+  - with dataset file outside folder and apd inside the folder
 - run <b>Check_dtime_start</b>, and check wether the lifetime start from the same location (you probably need to run each section based on your requirement)
   - <b>cd</b> into the direction of desired folder called 'apd full'
   - put days into the column as the format of string in the variable called <b>days</b>
